@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-black text-[#F0F0F0] selection:bg-white selection:text-black">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KAENSAN — Architectural & Exhibition Archive</title>
+    <meta name="description" content="Museum-grade minimalist, brutalist architectural archive of works, exhibitions, and curatorial research." />
+    <!-- Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,300;0,400;0,700;0,900;1,300;1,700&family=Cinzel:wght@400;600;700;900&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,300&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body class="bg-black text-[#F0F0F0] antialiased min-h-screen relative selection:bg-white selection:text-black">
+    <div class="fixed inset-0 film-grain z-40 pointer-events-none"></div>
+
+    <!-- Quick Screen Switcher Toolbar (Floating Minimal Pill) -->
+    <div id="screen-toolbar" class="fixed bottom-4 right-4 z-[100] bg-black/90 backdrop-blur-md border border-[#333333] px-3 py-1.5 hidden sm:flex items-center gap-2 text-[11px] font-mono tracking-wider text-neutral-400 shadow-2xl transition-all duration-300 opacity-60 hover:opacity-100 max-w-[calc(100vw-2rem)] overflow-x-auto">
+      <span class="inline-flex items-center gap-1.5 text-white font-bold text-[10px] mr-1">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        KAENSAN
+      </span>
+      
+      <div class="flex items-center gap-1">
+        <button id="btn-screen-8" class="screen-tab px-2 py-0.5 border border-white bg-white text-black font-semibold uppercase text-[10px] transition-colors" title="Home Screen Desktop (Framed Layout)">
+          SCR_8
+        </button>
+        <button id="btn-screen-9" class="screen-tab px-2 py-0.5 border border-[#333333] hover:border-neutral-500 text-neutral-400 hover:text-white uppercase text-[10px] transition-colors" title="Home Screen Mobile (Full Height Portrait)">
+          SCR_9
+        </button>
+        <button id="btn-works" class="screen-tab px-2 py-0.5 border border-[#333333] hover:border-neutral-500 text-neutral-400 hover:text-white uppercase text-[10px] transition-colors" title="Works Catalogue Overview (Images First)">
+          WORKS
+        </button>
+        <button id="btn-about" class="screen-tab px-2 py-0.5 border border-[#333333] hover:border-neutral-500 text-neutral-400 hover:text-white uppercase text-[10px] transition-colors" title="Biography & Timeline">
+          ABOUT
+        </button>
+        <button id="btn-contact" class="screen-tab px-2 py-0.5 border border-[#333333] hover:border-neutral-500 text-neutral-400 hover:text-white uppercase text-[10px] transition-colors" title="Contact & Enquiry Form">
+          CONTACT
+        </button>
+        <button id="btn-screen-7" class="screen-tab px-2 py-0.5 border border-[#333333] hover:border-neutral-500 text-neutral-400 hover:text-white uppercase text-[10px] transition-colors" title="Archive Detail Desktop (Editorial Stream)">
+          SCR_7
+        </button>
+        <button id="btn-screen-6" class="screen-tab px-2 py-0.5 border border-[#333333] hover:border-neutral-500 text-neutral-400 hover:text-white uppercase text-[10px] transition-colors" title="Archive Detail Mobile (Carousel & Specs Table)">
+          SCR_6
+        </button>
+        <button id="btn-responsive" class="screen-tab px-2 py-0.5 border border-[#333333] hover:border-neutral-500 text-neutral-400 hover:text-white uppercase text-[10px] transition-colors hidden sm:inline-block" title="Fluid Responsive Mode">
+          Auto
+        </button>
+      </div>
+    </div>
+
+    <!-- Application Root Container -->
+    <div id="app" class="w-full min-h-screen bg-black transition-all duration-300">
+      <!-- Injected by JavaScript -->
+    </div>
+
+    <!-- Interactive Overlays (Search Modal, Lightbox, Soundscape Modal, Navigation Drawer) -->
+    <div id="modal-container"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

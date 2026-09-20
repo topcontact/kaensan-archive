@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+dist-ssr/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Large local assets / documentation (>100MB exceeds GitHub limit)
+2024- Cv and Works.pdf
