@@ -1150,8 +1150,26 @@ window.addEventListener('resize', () => {
   }
 });
 
+// Sync state from URL parameters
+function syncFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const p = params.get('page');
+  const w = params.get('work');
+  if (p) {
+    state.activePage = p;
+    if (p === 'detail' && w) {
+      state.selectedWorkId = w;
+    }
+  }
+}
+
+// Global exposure for programmatic navigation & PDF capture
+window.__appState = state;
+window.__renderApp = renderApp;
+
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
+  syncFromUrl();
   setupToolbar();
   renderApp();
   setInterval(updateLiveClocks, 1000);

@@ -74,3 +74,18 @@ body {
 .animate-live-dot {
   animation: blink 2s infinite ease-in-out;
 }
+
+/* Print / PDF Export Styling */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  body {
+    background-color: #000000 !important;
+    color: #F0F0F0 !important;
+  }
+  #screen-toolbar {
+    display: none !important;
+  }
+}
