@@ -1,0 +1,13 @@
+# Large local files
+2024- Cv and Works.pdf
+pdf_exports/
+exports/
+scripts/
+
+# Development
+node_modules/
+.git/
+.vscode/
+.idea/
+.DS_Store
+dist/
