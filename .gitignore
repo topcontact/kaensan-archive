@@ -25,5 +25,7 @@ pnpm-debug.log*
 # Large local assets / documentation (>100MB exceeds GitHub limit)
 2024- Cv and Works.pdf
 
-# Generated PDF Exports
+# Generated Exports
 pdf_exports/
+exports/
+scripts/

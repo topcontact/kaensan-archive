@@ -1,3 +1,5 @@
+import { renderFooter } from './footer.js';
+
 /**
  * About Page Component
  * Complete curatorial biography, education, exhibition timeline (2012—2024),
@@ -230,21 +232,21 @@ export function renderAboutPage() {
       <nav class="sticky top-0 w-full bg-black/95 backdrop-blur-md border-b border-[#222222] h-16 sm:h-20 flex justify-between items-center px-4 sm:px-8 lg:px-12 z-40">
         <!-- Left: Brand / Return to Home -->
         <div class="flex items-center gap-3 sm:gap-4">
-          <button id="about-nav-home" class="group flex items-center gap-2 text-xs font-mono text-neutral-400 hover:text-white transition-colors">
+          <button id="about-nav-home" class="group flex items-center gap-2 text-sm font-mono text-neutral-400 hover:text-white transition-colors cursor-pointer">
             <span class="group-hover:-translate-x-1 transition-transform">←</span>
-            <span class="text-lg sm:text-xl font-black font-brand tracking-tighter uppercase text-white">KAENSAN</span>
+            <span class="text-xl sm:text-2xl font-black font-brand tracking-tighter uppercase text-white">KAENSAN</span>
           </button>
-          <span class="text-neutral-700 font-mono text-xs hidden sm:inline">/</span>
-          <span class="text-xs font-mono text-neutral-400 uppercase tracking-widest hidden md:inline">
+          <span class="text-neutral-700 font-mono text-sm hidden sm:inline">/</span>
+          <span class="text-sm font-mono text-neutral-400 uppercase tracking-widest hidden md:inline">
             BIOGRAPHY & TIMELINE (2012—2024)
           </span>
         </div>
 
         <!-- Right: Desktop Nav Links -->
-        <div class="hidden sm:flex items-center gap-6 md:gap-8 text-xs font-mono tracking-widest uppercase text-neutral-400">
-          <button id="about-link-work" class="hover:text-white transition-colors">WORK</button>
-          <button id="about-link-about" class="text-white border-b border-white pb-0.5">ABOUT</button>
-          <button id="about-link-contact" class="hover:text-white transition-colors">CONTACT</button>
+        <div class="hidden sm:flex items-center gap-6 md:gap-8 text-sm font-mono tracking-widest uppercase text-neutral-400">
+          <button id="about-link-work" class="hover:text-white transition-colors cursor-pointer">WORK</button>
+          <button id="about-link-about" class="text-white border-b border-white pb-0.5 cursor-pointer">ABOUT</button>
+          <button id="about-link-contact" class="hover:text-white transition-colors cursor-pointer">CONTACT</button>
         </div>
 
         <!-- Right: Mobile Menu Toggle Button (2-line SVG) -->
@@ -273,54 +275,54 @@ export function renderAboutPage() {
                   alt="Kaensan Rattanasomrerk — Portrait" 
                   class="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700 ease-out"
                 />
-                <div class="absolute bottom-2 left-2 bg-black/85 backdrop-blur px-2.5 py-1 text-[9px] font-mono tracking-widest text-neutral-300 border border-white/10">
+                <div class="absolute bottom-2 left-2 bg-black/85 backdrop-blur px-3 py-1 text-sm font-mono tracking-widest text-neutral-300 border border-white/10">
                   KAENSAN RATTANASOMRERK
                 </div>
               </div>
             </div>
 
             <!-- Artist Fact Sheet (Exact 2024 CV data) -->
-            <div class="border border-[#222222] bg-[#070707] divide-y divide-[#1c1c1c] text-xs font-mono w-full">
-              <div class="p-2.5 sm:p-3 flex justify-between items-center">
-                <span class="text-neutral-500 uppercase text-[11px]">BORN</span>
+            <div class="border border-[#222222] bg-[#070707] divide-y divide-[#1c1c1c] text-sm font-mono w-full">
+              <div class="p-3 sm:p-3.5 flex justify-between items-center">
+                <span class="text-neutral-500 uppercase text-sm">BORN</span>
                 <span class="text-white text-right">1989, Bangkok, TH</span>
               </div>
-              <div class="p-2.5 sm:p-3 flex justify-between items-center">
-                <span class="text-neutral-500 uppercase text-[11px]">EDUCATION (MA)</span>
+              <div class="p-3 sm:p-3.5 flex justify-between items-center">
+                <span class="text-neutral-500 uppercase text-sm">EDUCATION (MA)</span>
                 <span class="text-white text-right">Chiang Mai Univ (2023)</span>
               </div>
-              <div class="p-2.5 sm:p-3 flex justify-between items-center">
-                <span class="text-neutral-500 uppercase text-[11px]">EDUCATION (BA)</span>
+              <div class="p-3 sm:p-3.5 flex justify-between items-center">
+                <span class="text-neutral-500 uppercase text-sm">EDUCATION (BA)</span>
                 <span class="text-white text-right">Thammasat Univ (2012)</span>
               </div>
-              <div class="p-2.5 sm:p-3 flex justify-between items-center">
-                <span class="text-neutral-500 uppercase text-[11px]">ACADEMIC</span>
+              <div class="p-3 sm:p-3.5 flex justify-between items-center">
+                <span class="text-neutral-500 uppercase text-sm">ACADEMIC</span>
                 <span class="text-white text-right">Lecturer, Thammasat (2020–2024)</span>
               </div>
-              <div class="p-2.5 sm:p-3 flex justify-between items-center">
-                <span class="text-neutral-500 uppercase text-[11px]">RESIDENCIES</span>
-                <span class="text-white text-right">Taipei / Hokkaido (T-air)</span>
+              <div class="p-3 sm:p-3.5 flex justify-between items-center">
+                <span class="text-neutral-500 uppercase text-sm">RESIDENCIES</span>
+                <span class="text-white text-right">BKK, Thailand</span>
               </div>
             </div>
           </div>
 
           <!-- Right Column: Name & Authentic Curatorial Biography (8 cols) -->
           <div class="lg:col-span-8 flex flex-col justify-center">
-            <div class="text-[10px] sm:text-xs font-mono tracking-widest text-neutral-500 uppercase mb-2 sm:mb-3 flex items-center gap-2">
-              <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"></span>
+            <div class="text-sm font-mono tracking-widest text-neutral-500 uppercase mb-2 sm:mb-3 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-white"></span>
               <span>BIOGRAPHY & CURATORIAL PROFILE</span>
             </div>
 
-            <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black font-brand uppercase tracking-tighter text-white mb-3 sm:mb-6 leading-tight">
+            <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black font-brand uppercase tracking-tighter text-white mb-3 sm:mb-6 leading-tight">
               KAENSAN<br class="hidden sm:inline" /> RATTANASOMRERK
             </h1>
 
-            <div class="text-xs sm:text-sm font-mono text-neutral-400 tracking-wider uppercase mb-6 sm:mb-8 border-l-2 border-white pl-3 sm:pl-4">
+            <div class="text-sm sm:text-base font-mono text-neutral-400 tracking-wider uppercase mb-6 sm:mb-8 border-l-2 border-white pl-3 sm:pl-4">
               ARTIST & FILMMAKER // BANGKOK, THAILAND
             </div>
 
             <!-- Authentic Biography Text (Verbatim from 2024 CV) -->
-            <div class="space-y-4 sm:space-y-6 text-xs sm:text-base text-neutral-300 font-sans leading-[1.75] sm:leading-[1.8] font-normal">
+            <div class="space-y-4 sm:space-y-6 text-sm sm:text-base md:text-lg text-neutral-300 font-sans leading-[1.8] font-normal">
               <p>
                 <strong class="text-white font-semibold">Kaensan Rattanasomrerk</strong> was born in 1989 in Bangkok, Thailand. He graduated from Thammasat University with a Bachelor of Arts in Journalism and Mass Communication, Film Department. He later pursued a Master of Arts in Visual Arts from the Faculty of Fine Arts at Chiang Mai University.
               </p>
@@ -339,48 +341,45 @@ export function renderAboutPage() {
         <!-- Middle Section: Exhibition Timeline (2012 — 2024) -->
         <section class="pt-10 sm:pt-16">
           <div class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-[#222222] gap-2">
-            <h2 class="text-xl sm:text-2xl md:text-3xl font-black font-brand uppercase tracking-tight text-white">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-black font-brand uppercase tracking-tight text-white">
               EXHIBITIONS & WORKS (2012 — 2024)
             </h2>
-            <div class="text-[10px] sm:text-xs font-mono text-neutral-400 uppercase tracking-widest">
-              OFFICIAL CV EXHIBITION RECORD
+            <div class="text-sm font-mono text-neutral-400 uppercase tracking-widest">
+              OFFICIAL CV EXHIBITIONS
             </div>
           </div>
 
           <!-- Timeline Architectural Grid (Mobile & Desktop Responsive) -->
           <div class="border border-[#222222] divide-y divide-[#222222] bg-[#070707]">
             ${timelineData.map(group => `
-              <div class="p-4 sm:p-6 md:p-8 flex flex-col md:grid md:grid-cols-12 gap-4 sm:gap-6 hover:bg-[#0c0c0c] transition-colors">
+              <div class="p-5 sm:p-7 md:p-8 flex flex-col md:grid md:grid-cols-12 gap-4 sm:gap-6 hover:bg-[#0c0c0c] transition-colors">
                 
                 <!-- Year Column (Header on mobile, 2 cols on desktop) -->
                 <div class="md:col-span-2 pb-2 md:pb-0 border-b md:border-b-0 border-[#1a1a1a] flex items-baseline md:flex-col justify-between">
-                  <div class="text-xl sm:text-2xl md:text-3xl font-black font-mono text-white tracking-tight">
+                  <div class="text-2xl sm:text-3xl md:text-4xl font-black font-mono text-white tracking-tight">
                     ${group.year}
                   </div>
-                  <span class="text-[9px] sm:text-[10px] font-mono text-neutral-500 uppercase tracking-widest">
-                    RECORD
-                  </span>
                 </div>
 
                 <!-- Events Column (10 cols) -->
                 <div class="md:col-span-10 divide-y divide-[#181818]">
                   ${group.items.map((item, idx) => `
-                    <div class="${idx > 0 ? 'pt-3 sm:pt-4 mt-3 sm:mt-4' : ''} flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-2">
+                    <div class="${idx > 0 ? 'pt-4 mt-4' : ''} flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-2">
                       <div>
-                        <span class="text-white font-bold font-brand uppercase tracking-tight text-sm sm:text-base md:text-lg">
+                        <span class="text-white font-bold font-brand uppercase tracking-tight text-base sm:text-lg md:text-xl">
                           ${item.title}
                         </span>
-                        <span class="text-neutral-500 text-xs font-mono mx-1 sm:mx-2">—</span>
-                        <span class="text-neutral-300 text-xs sm:text-sm font-sans font-medium">
+                        <span class="text-neutral-500 text-sm font-mono mx-2">—</span>
+                        <span class="text-neutral-300 text-sm sm:text-base font-sans font-medium">
                           ${item.exhibition}
                         </span>
-                        <div class="text-[10px] sm:text-[11px] font-mono text-neutral-400 mt-1">
+                        <div class="text-sm font-mono text-neutral-400 mt-1.5">
                           ${item.venue}
                         </div>
                       </div>
 
                       <div class="self-start sm:self-auto shrink-0 mt-1 sm:mt-0">
-                        <span class="text-[9px] sm:text-[11px] font-mono text-neutral-400 border border-neutral-800 px-2 py-0.5 bg-neutral-950">
+                        <span class="text-sm font-mono text-neutral-300 border border-neutral-800 px-2.5 py-1 bg-neutral-950">
                           ${item.location}
                         </span>
                       </div>
@@ -396,25 +395,25 @@ export function renderAboutPage() {
         <!-- Work Experience & Film/Biennale Section -->
         <section class="pt-10 sm:pt-16">
           <div class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-[#222222] gap-2">
-            <h2 class="text-xl sm:text-2xl md:text-3xl font-black font-brand uppercase tracking-tight text-white">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-black font-brand uppercase tracking-tight text-white">
               FILM & BIENNALE EXPERIENCE
             </h2>
-            <div class="text-[10px] sm:text-xs font-mono text-neutral-400 uppercase tracking-widest">
+            <div class="text-sm font-mono text-neutral-400 uppercase tracking-widest">
               COLLABORATIVE DIRECTION, CINEMATOGRAPHY & EDITING
             </div>
           </div>
 
           <div class="border border-[#222222] divide-y divide-[#222222] bg-[#070707]">
             ${workExperienceData.map(item => `
-              <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 hover:bg-[#0c0c0c] transition-colors font-mono">
+              <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 hover:bg-[#0c0c0c] transition-colors font-mono text-sm">
                 <div class="flex items-center gap-4">
-                  <span class="text-neutral-500 text-xs">${item.year}</span>
+                  <span class="text-neutral-500 text-sm font-bold">${item.year}</span>
                   <div>
-                    <span class="text-white text-xs sm:text-sm font-bold">${item.role}:</span>
-                    <span class="text-neutral-300 text-xs sm:text-sm font-sans ml-1">${item.project}</span>
+                    <span class="text-white text-sm sm:text-base font-bold">${item.role}:</span>
+                    <span class="text-neutral-300 text-sm sm:text-base font-sans ml-1">${item.project}</span>
                   </div>
                 </div>
-                <div class="text-[11px] text-neutral-400 border border-neutral-800 px-2 py-0.5 self-start sm:self-auto bg-neutral-950">
+                <div class="text-sm text-neutral-400 border border-neutral-800 px-2.5 py-1 self-start sm:self-auto bg-neutral-950">
                   ${item.partner}
                 </div>
               </div>
@@ -423,16 +422,16 @@ export function renderAboutPage() {
         </section>
 
         <!-- Direct Contact Footer Banner -->
-        <section class="mt-12 sm:mt-16 p-5 sm:p-8 border border-[#222222] bg-gradient-to-r from-[#080808] via-black to-[#080808] flex flex-col md:flex-row justify-between items-start md:items-center gap-5 sm:gap-6">
+        <section class="mt-12 sm:mt-16 p-6 sm:p-8 border border-[#222222] bg-gradient-to-r from-[#080808] via-black to-[#080808] flex flex-col md:flex-row justify-between items-start md:items-center gap-5 sm:gap-6">
           <div class="w-full sm:w-auto">
-            <div class="text-[10px] sm:text-xs font-mono text-neutral-500 uppercase tracking-widest mb-1">INQUIRIES & REPRODUCTION RIGHTS</div>
-            <div class="text-base sm:text-lg font-bold font-brand uppercase text-white tracking-tight">CONTACT KAENSAN STUDIO</div>
-            <div class="text-xs font-mono text-neutral-400 mt-1 break-all sm:break-normal">
+            <div class="text-sm font-mono text-neutral-500 uppercase tracking-widest mb-1.5 font-bold">INQUIRIES & REPRODUCTION RIGHTS</div>
+            <div class="text-lg sm:text-xl font-bold font-brand uppercase text-white tracking-tight">CONTACT KAENSAN STUDIO</div>
+            <div class="text-sm font-mono text-neutral-400 mt-1 break-all sm:break-normal">
               kaensan@gmail.com // +(66) 85-902-1411
             </div>
           </div>
 
-          <button id="about-btn-contact-cta" class="w-full md:w-auto px-6 py-3 border border-white bg-white text-black hover:bg-neutral-200 text-xs font-mono font-bold tracking-widest uppercase transition-colors text-center cursor-pointer">
+          <button id="about-btn-contact-cta" class="w-full md:w-auto px-6 py-3.5 border border-white bg-white text-black hover:bg-neutral-200 text-sm font-mono font-bold tracking-widest uppercase transition-colors text-center cursor-pointer">
             [ SEND DIRECT ENQUIRY → ]
           </button>
         </section>
@@ -440,19 +439,7 @@ export function renderAboutPage() {
       </main>
 
       <!-- Institutional Footer -->
-      <footer class="w-full border-t border-[#222222] bg-[#050505] px-4 sm:px-8 lg:px-12 py-8 sm:py-10 text-xs font-mono text-neutral-400 mt-12 sm:mt-16">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 text-center sm:text-left">
-          <div>
-            <span class="text-white font-bold">KAENSAN RATTANASOMRERK</span>
-            <span class="text-neutral-600 mx-1 sm:mx-2">|</span>
-            <span class="text-neutral-500">BANGKOK, THAILAND</span>
-          </div>
-
-          <div class="text-neutral-500 text-[10px] sm:text-[11px]">
-            © 2024 KAENSAN RATTANASOMRERK. ALL RIGHTS RESERVED.
-          </div>
-        </div>
-      </footer>
+      ${renderFooter({ containerClass: 'max-w-7xl mx-auto', extraClass: 'mt-12 sm:mt-16' })}
 
     </div>
   `;

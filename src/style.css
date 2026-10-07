@@ -54,8 +54,23 @@ body {
   top: -8px;
   left: -5px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
+  font-size: 14px;
   color: #555555;
+}
+
+/* Global Typography Standard: Minimum font size across entire web is 14px (text-sm), matching EXPLORE PROJECT ARCHIVE */
+html, body {
+  font-size: 16px;
+}
+
+.text-xs,
+.text-\[9px\],
+.text-\[10px\],
+.text-\[11px\],
+.text-\[12px\],
+.text-\[13px\] {
+  font-size: 0.875rem !important; /* 14px */
+  line-height: 1.25rem !important;
 }
 
 /* Smooth Image hover reveal */
@@ -75,6 +90,28 @@ body {
   animation: blink 2s infinite ease-in-out;
 }
 
+/* Responsive 16:9 Cinema Container */
+.hero-16-9-parent {
+  container-type: size;
+}
+
+.hero-16-9-box {
+  aspect-ratio: 16 / 9;
+  width: min(100cqw, calc(100cqh * 16 / 9));
+  height: min(100cqh, calc(100cqw * 9 / 16));
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Custom Cinema Aspect Ratios */
+.aspect-19-6 {
+  aspect-ratio: 19 / 6;
+}
+.aspect-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+
 /* Print / PDF Export Styling */
 @media print {
   * {
@@ -84,8 +121,5 @@ body {
   body {
     background-color: #000000 !important;
     color: #F0F0F0 !important;
-  }
-  #screen-toolbar {
-    display: none !important;
   }
 }

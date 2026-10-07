@@ -1,183 +1,205 @@
 import { ARCHIVE_DATA } from '../data.js';
+import { renderFooter } from './footer.js';
 
 /**
- * Screen 8: Home Desktop (Framed Layout)
- * Matches the exact museum-grade minimal architectural specification from the user mockup:
- * - Full viewport framed layout (100vh, overflow: hidden, zero page scrollbar)
- * - Outer padded container with 1px architectural perimeter border
- * - Header: Bold KAENSAN wordmark (left) + ARCHIVE, EXHIBITIONS, ABOUT, CONTACT (right)
- * - Hero Media: Edge-to-edge full width/height within the framed space for massive visual impact
- * - Bottom Meta Bar:
- *   - Left: ECHO — 2026 + EXHIBITION: ART CENTRE SILPAKORN UNIVERSITY (WANG THAPRA), BANGKOK
- *   - Center: [ EXPLORE PROJECT ARCHIVE → ]
- *   - Right (with vertical divider line): © 2026 KAENSAN ARCHIVE + INSTAGRAM / VIMEO
+ * KAENSAN — Official Home Screen (Minimalist Floating Monolith)
+ * Designed for pure gallery minimalism across all responsive breakpoints:
+ * - Minimal Header: KAENSAN (left) | WORK, ABOUT, CONTACT (right)
+ * - Pure 16:9 floating art canvas without any badges or overlays
+ * - Curatorial caption: Title, Subtitle, Venue, and [ EXPLORE PROJECT ARCHIVE → ]
+ * - Clean Footer: BANGKOK, TH (left) | INSTAGRAM, EMAIL, © 2024 KAENSAN (right)
+ * - Zero format switchers, zero clocks/tickers
  */
+
 export function renderHomeScreenDesktop() {
   const exhibition = ARCHIVE_DATA.currentExhibition;
-
   return `
-    <div class="w-screen h-screen p-4 sm:p-6 md:p-8 lg:p-10 flex flex-col justify-center items-center overflow-hidden bg-black text-[#F0F0F0] select-none box-border">
-      <!-- Framed Perimeter Container -->
-      <div class="w-full h-full border border-[#222222] flex flex-col justify-between bg-black overflow-hidden relative">
-        
-        <!-- Top Institutional Header -->
-        <header class="w-full h-16 md:h-20 border-b border-[#222222] flex justify-between items-center px-6 md:px-10 shrink-0 z-10 bg-black">
-          <button id="nav-brand-home" class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter uppercase font-brand text-white hover:opacity-85 transition-opacity">
-            KAENSAN
-          </button>
-
-          <nav class="flex items-center gap-8 md:gap-12 text-xs md:text-[13px] font-mono tracking-widest uppercase text-neutral-300">
-            <button id="nav-btn-work" class="hover:text-white transition-colors">
-              WORK
-            </button>
-            <button id="nav-btn-about" class="hover:text-white transition-colors">
-              ABOUT
-            </button>
-            <button id="nav-btn-contact" class="hover:text-white transition-colors">
-              CONTACT
-            </button>
-          </nav>
-        </header>
-
-        <!-- Center Hero Media (Massive Edge-to-Edge Architectural Projection) -->
-        <main class="flex-1 w-full min-h-0 relative overflow-hidden bg-black flex items-center justify-center">
-          <img 
-            id="home-hero-image"
-            src="${exhibition.heroImage}" 
-            alt="${exhibition.heroAlt}" 
-            class="w-full h-full object-cover object-center filter grayscale contrast-125 transition-transform duration-1000 ease-out hover:scale-[1.01]"
-          />
-        </main>
-
-        <!-- Bottom Meta Bar -->
-        <footer class="w-full border-t border-[#222222] shrink-0 z-10 bg-black">
-          <!-- Mobile: stacked layout -->
-          <div class="flex md:hidden flex-col gap-2 px-4 py-3">
-            <div class="flex items-center justify-between">
-              <div>
-                <h2 class="text-base font-bold tracking-tight text-white font-brand uppercase leading-tight">
-                  ${exhibition.title}
-                </h2>
-                <p class="text-[10px] text-neutral-400 tracking-wider uppercase font-mono mt-0.5">
-                  ${exhibition.venue}
-                </p>
-              </div>
-              <div class="text-[10px] font-mono text-neutral-500 text-right shrink-0 ml-3">
-                © 2024 KAENSAN
-              </div>
-            </div>
-            <button id="cta-explore-archive-mobile" class="w-full py-2 text-[11px] font-mono tracking-widest text-black bg-white hover:bg-neutral-200 uppercase transition-all cursor-pointer font-bold">
-              [ EXPLORE PROJECT ARCHIVE → ]
-            </button>
-          </div>
-
-          <!-- Desktop: three-column layout -->
-          <div class="hidden md:flex h-24 justify-between items-center px-10">
-            <!-- Left: Title & Venue -->
-            <div class="flex flex-col justify-center">
-              <h2 class="text-2xl font-bold tracking-tight text-white font-brand uppercase leading-tight mb-1">
-                ${exhibition.title}
-              </h2>
-              <p class="text-xs text-neutral-300 tracking-wider uppercase font-mono">
-                ${exhibition.venue}
-              </p>
-            </div>
-
-            <!-- Center: CTA Action Link -->
-            <div class="flex items-center justify-center">
-              <button id="cta-explore-archive" class="text-sm font-mono tracking-widest text-white hover:text-neutral-300 uppercase transition-all py-2 cursor-pointer inline-flex items-center gap-1 group">
-                <span>[ EXPLORE PROJECT ARCHIVE</span>
-                <span class="group-hover:translate-x-1 transition-transform">→ ]</span>
-              </button>
-            </div>
-
-            <!-- Right: Vertical Divider + Copyright & Socials -->
-            <div class="border-l border-[#222222] pl-10 text-right flex flex-col justify-center">
-              <div class="text-[13px] font-bold uppercase tracking-wider text-white font-mono mb-1">
-                © 2024 KAENSAN ARCHIVE
-              </div>
-              <div class="flex items-center justify-end gap-8 text-xs tracking-widest uppercase text-neutral-400 font-mono">
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" class="hover:text-white transition-colors">
-                  INSTAGRAM
-                </a>
-                <a href="https://vimeo.com" target="_blank" rel="noreferrer" class="hover:text-white transition-colors">
-                  VIMEO
-                </a>
-              </div>
-            </div>
-          </div>
-        </footer>
-
+    <div class="min-h-screen w-full bg-black text-[#F0F0F0] selection:bg-white selection:text-black select-none flex flex-col justify-between overflow-x-hidden">
+      ${renderInstitutionalNavbar(false)}
+      
+      <div class="flex-1 flex flex-col justify-between">
+        ${renderHeroMonolith(exhibition, false)}
       </div>
+
+      ${renderFooter({ containerClass: 'w-full max-w-7xl mx-auto' })}
+    </div>
+  `;
+}
+
+export function renderHomeScreenMobile() {
+  const exhibition = ARCHIVE_DATA.currentExhibition;
+  return `
+    <div class="min-h-screen w-full bg-black text-[#F0F0F0] selection:bg-white selection:text-black select-none flex flex-col justify-between overflow-x-hidden">
+      ${renderInstitutionalNavbar(true)}
+      
+      <div class="flex-1 flex flex-col justify-between">
+        ${renderHeroMonolith(exhibition, true)}
+      </div>
+
+      ${renderFooter()}
     </div>
   `;
 }
 
 /**
- * Screen 9: Home Mobile
- * Full height portrait (h-screen / min-h-screen, flex flex-col justify-between p-6)
+ * Institutional Top Navigation Bar
+ * Left: KAENSAN
+ * Right: WORK, ABOUT, CONTACT (Desktop) | WORK, Menu (Mobile)
  */
-export function renderHomeScreenMobile() {
-  const exhibition = ARCHIVE_DATA.currentExhibition;
+function renderInstitutionalNavbar(isMobile) {
+  if (isMobile) {
+    return `
+      <!-- Mobile Navigation Bar -->
+      <nav class="sticky top-0 w-full bg-black/95 backdrop-blur-md border-b border-[#222222] h-16 flex justify-between items-center px-4 sm:px-6 z-40 shrink-0">
+        <!-- Brand -->
+        <button id="mobile-nav-brand" class="text-xl font-black font-brand tracking-tighter uppercase text-white hover:opacity-85 transition-opacity cursor-pointer">
+          KAENSAN
+        </button>
+
+        <!-- Right Quick Actions -->
+        <div class="flex items-center gap-3">
+          <button id="nav-btn-work" class="text-sm font-mono tracking-widest uppercase text-neutral-200 hover:text-white transition-colors cursor-pointer px-3 py-1 border border-neutral-800 bg-[#0d0d0d]">
+            WORK
+          </button>
+          <!-- 2-line minimal hamburger button -->
+          <button id="mobile-menu-toggle" class="p-2 text-neutral-300 hover:text-white border border-neutral-800 transition-colors cursor-pointer bg-[#0d0d0d]" aria-label="Open Navigation Menu">
+            <svg class="w-5 h-3" viewBox="0 0 20 12" fill="none" stroke="currentColor">
+              <line x1="0" y1="2" x2="20" y2="2" stroke-width="1.75" />
+              <line x1="0" y1="10" x2="20" y2="10" stroke-width="1.75" />
+            </svg>
+          </button>
+        </div>
+      </nav>
+    `;
+  }
 
   return `
-    <div class="h-screen max-h-screen p-4 sm:p-5 flex flex-col justify-between bg-black text-[#F0F0F0] relative select-none box-border overflow-hidden">
-      <!-- Framed Perimeter for Mobile -->
-      <div class="w-full h-full border border-[#222222] flex flex-col justify-between bg-black overflow-hidden">
-        
-        <!-- Mobile Header -->
-        <header class="w-full h-14 border-b border-[#222222] flex justify-between items-center px-4 shrink-0 bg-black">
-          <button id="mobile-nav-brand" class="text-xl font-black tracking-tighter uppercase font-brand text-white">
+    <!-- Desktop Navigation Bar -->
+    <nav class="sticky top-0 w-full bg-black/95 backdrop-blur-md border-b border-[#222222] h-18 lg:h-20 flex justify-between items-center px-6 sm:px-8 lg:px-12 z-40 shrink-0">
+      <!-- Left: Brand -->
+      <div class="flex items-center">
+        <button id="nav-brand-home" class="group flex items-center text-sm font-mono text-neutral-400 hover:text-white transition-colors cursor-pointer">
+          <span class="text-2xl sm:text-3xl font-black font-brand tracking-tighter uppercase text-white group-hover:opacity-85 transition-opacity">
             KAENSAN
-          </button>
+          </span>
+        </button>
+      </div>
 
-          <div class="flex items-center gap-3">
-            <!-- Minimal Hamburger Icon (2-line SVG) -->
-            <button id="mobile-menu-toggle" class="p-2 text-neutral-300 hover:text-white transition-colors" aria-label="Menu">
-              <svg class="w-5 h-3" viewBox="0 0 20 12" fill="none" stroke="currentColor">
-                <line x1="0" y1="2" x2="20" y2="2" stroke-width="1.75" />
-                <line x1="0" y1="10" x2="20" y2="10" stroke-width="1.75" />
-              </svg>
-            </button>
-          </div>
-        </header>
+      <!-- Right: Global Nav (WORK, ABOUT, CONTACT) -->
+      <div class="hidden sm:flex items-center gap-8 lg:gap-10 text-sm font-mono tracking-widest uppercase text-neutral-400">
+        <button id="nav-btn-work" class="text-white hover:text-white transition-colors cursor-pointer border-b border-white pb-0.5 font-bold">
+          WORK
+        </button>
+        <button id="nav-btn-about" class="hover:text-white transition-colors cursor-pointer">
+          ABOUT
+        </button>
+        <button id="nav-btn-contact" class="hover:text-white transition-colors cursor-pointer">
+          CONTACT
+        </button>
+      </div>
 
-        <!-- Centered Framed Art Piece -->
-        <div class="flex-1 w-full min-h-0 relative overflow-hidden bg-black flex items-center justify-center">
+      <!-- Fallback Hamburger for small tablet -->
+      <div class="flex items-center gap-2 sm:hidden">
+        <button id="mobile-menu-toggle" class="p-2 text-neutral-300 hover:text-white border border-neutral-800" aria-label="Open Navigation Menu">
+          <svg class="w-5 h-3" viewBox="0 0 20 12" fill="none" stroke="currentColor">
+            <line x1="0" y1="2" x2="20" y2="2" stroke-width="1.75" />
+            <line x1="0" y1="10" x2="20" y2="10" stroke-width="1.75" />
+          </svg>
+        </button>
+      </div>
+    </nav>
+  `;
+}
+
+
+/**
+ * Pure 16:9 Floating Monolith Hero Canvas & Curatorial Caption
+ * Apple.com Hierarchy: Kicker -> Headline (H1) -> Subhead -> Specs -> CTA
+ */
+function renderHeroMonolith(exhibition, isMobile) {
+  if (isMobile) {
+    return `
+      <!-- Mobile View: Pure 16:9 Monolith -->
+      <main class="w-full flex-1 flex flex-col justify-center items-center px-4 sm:px-6 py-5 sm:py-6 my-auto">
+        <!-- Strict 16:9 Floating Art Canvas -->
+        <div class="w-full aspect-[16/9] border border-white/20 bg-black overflow-hidden relative shadow-[0_15px_35px_-10px_rgba(255,255,255,0.08)] group cursor-pointer" id="monolith-hero-box">
           <img 
             src="${exhibition.heroImage}" 
             alt="${exhibition.heroAlt}" 
-            class="w-full h-full object-cover object-center filter grayscale contrast-125"
+            class="w-full h-full object-cover object-center filter grayscale contrast-125 transition-all duration-700 group-hover:scale-[1.02]"
           />
         </div>
 
-        <!-- Mobile Bottom Content -->
-        <div class="border-t border-[#222222] p-4 flex flex-col gap-3 font-mono text-xs bg-black shrink-0">
+        <!-- Curatorial Caption Block Beneath Image (Apple Typographic Rhythm) -->
+        <div class="w-full mt-5 flex flex-col gap-3">
           <div>
-            <h2 class="text-white text-base font-bold tracking-tight font-brand uppercase">
+            <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-1">
+              FEATURED EXHIBITION // 2023
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black font-brand uppercase tracking-tight text-white leading-tight mb-1">
               ${exhibition.title}
-            </h2>
-            <p class="text-neutral-400 text-[10px] uppercase tracking-wider mt-0.5 leading-snug">
+            </h1>
+            <p class="text-base text-neutral-300 font-sans leading-snug mb-1">
+              ${exhibition.subtitle}
+            </p>
+            <p class="text-sm font-mono text-neutral-500 uppercase tracking-wider">
               ${exhibition.venue}
             </p>
           </div>
 
-          <!-- Mobile CTA -->
-          <button id="mobile-cta-explore" class="w-full py-2.5 text-center text-xs uppercase font-bold tracking-widest bg-white text-black hover:bg-neutral-200 transition-colors">
+          <!-- Touch-friendly Full-Width Action Button -->
+          <button id="mobile-cta-explore" class="w-full py-3.5 bg-white text-black text-sm uppercase font-mono font-bold tracking-widest hover:bg-neutral-200 transition-colors cursor-pointer text-center shadow-lg mt-2">
             [ EXPLORE PROJECT ARCHIVE → ]
           </button>
+        </div>
+      </main>
+    `;
+  }
 
-          <!-- Location & Live Time -->
-          <div class="flex justify-between items-center text-[10px] text-neutral-500 pt-1 border-t border-neutral-900">
-            <span class="text-neutral-400 tracking-widest">BANGKOK, TH</span>
-            <div class="flex items-center gap-1.5 text-neutral-300 font-semibold">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span id="mobile-live-time">02:41:00 AM</span>
-            </div>
+  // Desktop / Tablet View: Pure 16:9 Monolith
+  return `
+    <main class="w-full flex-1 flex flex-col justify-center items-center px-6 sm:px-10 lg:px-14 py-4 sm:py-6 lg:py-8 my-auto">
+      <!-- Strict 16:9 Floating Canvas with Height Adaptability -->
+      <div 
+        class="w-full max-w-4xl xl:max-w-5xl aspect-[16/9] max-h-[50vh] border border-white/20 bg-black overflow-hidden relative shadow-[0_25px_60px_-15px_rgba(255,255,255,0.07)] group cursor-pointer transition-all duration-700 hover:border-white/50" 
+        id="monolith-hero-box"
+      >
+        <img 
+          src="${exhibition.heroImage}" 
+          alt="${exhibition.heroAlt}" 
+          class="w-full h-full object-cover object-center filter grayscale contrast-125 transition-all duration-1000 ease-out group-hover:scale-[1.018]"
+        />
+
+        <!-- Subtle hover overlay without text badges -->
+        <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+      </div>
+
+      <!-- Curatorial Caption Row Beneath Image (Apple Typographic Rhythm) -->
+      <div class="w-full max-w-4xl xl:max-w-5xl mt-6 lg:mt-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6 font-mono text-sm">
+        <!-- Left Column: Kicker, Headline, Subhead, Venue -->
+        <div class="min-w-0 flex-1">
+          <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-2">
+            FEATURED EXHIBITION // 2023
           </div>
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black font-brand uppercase tracking-tighter text-white leading-tight mb-2">
+            ${exhibition.title}
+          </h1>
+          <p class="text-base sm:text-lg text-neutral-300 font-sans leading-relaxed mb-1.5">
+            ${exhibition.subtitle}
+          </p>
+          <p class="text-sm font-mono text-neutral-400 uppercase tracking-wider">
+            ${exhibition.venue}
+          </p>
         </div>
 
+        <!-- Right Column: Explore CTA Button -->
+        <div class="shrink-0 pt-2 md:pt-0">
+          <button id="cta-explore-archive" class="px-8 py-4 bg-white text-black hover:bg-neutral-200 uppercase font-mono text-sm font-bold tracking-widest transition-all cursor-pointer inline-flex items-center gap-2 group shadow-xl whitespace-nowrap">
+            <span>[ EXPLORE PROJECT ARCHIVE</span>
+            <span class="group-hover:translate-x-1.5 transition-transform">→ ]</span>
+          </button>
+        </div>
       </div>
-    </div>
+    </main>
   `;
 }

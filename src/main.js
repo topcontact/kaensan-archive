@@ -3,13 +3,12 @@ import { renderArchiveDetailDesktop, renderArchiveDetailMobile } from './compone
 import { renderWorksCatalogue } from './components/works.js';
 import { renderAboutPage } from './components/about.js';
 import { renderContactPage } from './components/contact.js';
-import { renderSearchModal, renderLightboxModal, renderMobileNavDrawer, toggleAudioSoundscape } from './components/modals.js';
+import { renderLightboxModal, renderMobileNavDrawer, toggleAudioSoundscape } from './components/modals.js';
 import { ARCHIVE_DATA } from './data.js';
 
 // Application State
 const state = {
-  currentViewMode: 'screen_8', // 'screen_8' | 'screen_9' | 'works' | 'about' | 'screen_7' | 'screen_6' | 'fluid'
-  activePage: 'home', // 'home' | 'works' | 'about' | 'detail'
+  activePage: 'home', // 'home' | 'works' | 'about' | 'contact' | 'detail'
   activeCategoryFilter: 'ALL',
   selectedWorkId: 'heavy-metal-2023',
   mobileSlideIndex: 0,
@@ -21,202 +20,118 @@ const state = {
 // Global flag to suppress click navigation during swipe
 let isGlobalSwiping = false;
 
-// Bangkok Clock Ticker
-function getBangkokTimeString() {
-  const now = new Date();
-  return now.toLocaleTimeString('en-US', {
-    timeZone: 'Asia/Bangkok',
-    hour12: true,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
+// Centralized SPA Router with Browser History API
+function navigateTo(page, options = {}) {
+  const { workId = null, pushHistory = true } = options;
+  state.activePage = page;
+  if (workId) {
+    state.selectedWorkId = workId;
+    state.dossierSlideIndex = state.cardSlideIndices[workId] || 0;
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.set('page', page);
+  if (workId) {
+    url.searchParams.set('work', workId);
+  } else {
+    url.searchParams.delete('work');
+  }
+  // Clean up any old dev parameters
+  url.searchParams.delete('mode');
+  url.searchParams.delete('screen');
+  url.searchParams.delete('style');
+  url.searchParams.delete('ratio');
+  url.searchParams.delete('hero');
+  url.searchParams.delete('detail_hero');
+  url.searchParams.delete('hero_detail');
+  url.searchParams.delete('dh');
+
+  if (pushHistory) {
+    window.history.pushState({ page, workId: state.selectedWorkId }, '', url.pathname + url.search);
+  }
+
+  renderApp();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function updateLiveClocks() {
-  const timeStr = getBangkokTimeString();
-  const toolbarClock = document.getElementById('toolbar-live-time');
-  if (toolbarClock) toolbarClock.textContent = `${timeStr} BKK`;
-
-  const homeLiveTime = document.getElementById('home-live-time');
-  if (homeLiveTime) homeLiveTime.textContent = timeStr;
-
-  const mobileLiveTime = document.getElementById('mobile-live-time');
-  if (mobileLiveTime) mobileLiveTime.textContent = timeStr;
-
-  const footerLiveTime = document.getElementById('footer-live-time');
-  if (footerLiveTime) footerLiveTime.textContent = `${timeStr} ICT`;
-
-  const mobileArchiveTime = document.getElementById('mobile-archive-time');
-  if (mobileArchiveTime) mobileArchiveTime.textContent = timeStr;
-
-  const worksLiveTime = document.getElementById('works-live-time');
-  if (worksLiveTime) worksLiveTime.textContent = `${timeStr} ICT`;
-
-  const contactLiveTime = document.getElementById('contact-live-clock');
-  if (contactLiveTime) contactLiveTime.textContent = `${timeStr} ICT`;
+// In-App Back Navigation Handler (browser back with fallback)
+function handleGoBack(fallbackPage = 'home') {
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    navigateTo(fallbackPage, { pushHistory: true });
+  }
 }
 
-// Render the application root
+// Browser Back / Forward & Gesture Swipe Navigation
+window.addEventListener('popstate', (e) => {
+  const params = new URLSearchParams(window.location.search);
+  const page = (e.state && e.state.page) || params.get('page') || 'home';
+  const work = (e.state && e.state.workId) || params.get('work') || state.selectedWorkId;
+
+  state.activePage = page;
+  if (work) {
+    state.selectedWorkId = work;
+    state.dossierSlideIndex = state.cardSlideIndices[work] || 0;
+  }
+
+  renderApp();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Render the application root (Pure Native Fluid Responsive)
 function renderApp() {
   const app = document.getElementById('app');
   if (!app) return;
 
-  const mode = state.currentViewMode;
-  const isFluid = mode === 'fluid';
-  const isDesktopScreen = isFluid 
-    ? window.innerWidth >= 1024 
-    : (mode === 'screen_8' || mode === 'screen_7' || mode === 'works');
-
+  const isMobile = window.innerWidth < 768;
   let htmlContent = '';
 
   if (state.activePage === 'home') {
-    if (mode === 'screen_9' || (!isDesktopScreen && isFluid)) {
-      // Screen 9: Home Mobile
-      htmlContent = `
-        <div class="max-w-md mx-auto min-h-screen border-x border-[#222222] shadow-2xl bg-black">
-          ${renderHomeScreenMobile()}
-        </div>
-      `;
-    } else {
-      // Screen 8: Home Desktop
-      htmlContent = renderHomeScreenDesktop();
-    }
+    htmlContent = isMobile ? renderHomeScreenMobile() : renderHomeScreenDesktop();
   } else if (state.activePage === 'works') {
-    // Works Catalogue Overview Screen (Images first, Title second, Short details third)
     htmlContent = renderWorksCatalogue(state.cardSlideIndices);
   } else if (state.activePage === 'about') {
-    // Biography & Curatorial Timeline Screen (kaensan.com/about)
     htmlContent = renderAboutPage();
   } else if (state.activePage === 'contact') {
-    // Contact & Enquiry Form Screen (kaensan.com/contact)
     htmlContent = renderContactPage();
+  } else if (state.activePage === 'detail') {
+    htmlContent = isMobile 
+      ? renderArchiveDetailMobile(state.selectedWorkId, state.dossierSlideIndex) 
+      : renderArchiveDetailDesktop(state.selectedWorkId, state.dossierSlideIndex);
   } else {
-    // Work Detail Screen
-    if (mode === 'screen_6' || (!isDesktopScreen && isFluid)) {
-      // Screen 6: Archive Detail Mobile
-      htmlContent = `
-        <div class="max-w-md mx-auto min-h-screen border-x border-[#222222] shadow-2xl bg-black">
-          ${renderArchiveDetailMobile(state.selectedWorkId, state.dossierSlideIndex)}
-        </div>
-      `;
-    } else {
-      // Screen 7: Archive Detail Desktop
-      htmlContent = renderArchiveDetailDesktop(state.selectedWorkId, state.dossierSlideIndex);
-    }
+    htmlContent = renderHomeScreenDesktop();
   }
 
   app.innerHTML = htmlContent;
   bindEvents();
-  updateLiveClocks();
 }
 
 // Bind DOM event listeners
 function bindEvents() {
   // Navigation: Brand / Home
-  const brandHome = document.getElementById('nav-brand-home');
-  if (brandHome) {
-    brandHome.addEventListener('click', () => {
-      state.activePage = 'home';
-      state.currentViewMode = 'screen_8';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  const mobileBrandHome = document.getElementById('mobile-nav-brand');
-  if (mobileBrandHome) {
-    mobileBrandHome.addEventListener('click', () => {
-      state.activePage = 'home';
-      state.currentViewMode = 'screen_9';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  // CTA Explore Archive -> Enters Works Catalogue Overview
-  const ctaExplore = document.getElementById('cta-explore-archive');
-  if (ctaExplore) {
-    ctaExplore.addEventListener('click', () => {
-      state.activePage = 'works';
-      state.currentViewMode = 'works';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  // CTA Explore Archive (Mobile variant in SCR_8 footer)
-  const ctaExploreMobileSCR8 = document.getElementById('cta-explore-archive-mobile');
-  if (ctaExploreMobileSCR8) {
-    ctaExploreMobileSCR8.addEventListener('click', () => {
-      state.activePage = 'works';
-      state.currentViewMode = 'works';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  const mobileCtaExplore = document.getElementById('mobile-cta-explore');
-  if (mobileCtaExplore) {
-    mobileCtaExplore.addEventListener('click', () => {
-      state.activePage = 'works';
-      state.currentViewMode = 'works';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  // Top Nav Buttons (WORK)
-  const navWorkButtons = [
-    document.getElementById('nav-btn-work'),
-    document.getElementById('nav-btn-archive'),
-    document.getElementById('nav-works'),
-    document.getElementById('works-link-work'),
-  ];
-  navWorkButtons.forEach(btn => {
-    if (btn) {
-      btn.addEventListener('click', () => {
-        state.activePage = 'works';
-        state.currentViewMode = 'works';
-        updateToolbarTabs();
-        renderApp();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    }
+  ['nav-brand-home', 'mobile-nav-brand', 'works-nav-home'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', () => navigateTo('home'));
   });
 
-  // Works Page Nav Events
-  const worksNavHome = document.getElementById('works-nav-home');
-  if (worksNavHome) {
-    worksNavHome.addEventListener('click', () => {
-      state.activePage = 'home';
-      state.currentViewMode = 'screen_8';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
+  // CTA Explore Archive & Monolith Box -> Works
+  ['cta-explore-archive', 'cta-explore-archive-mobile', 'mobile-cta-explore', 'monolith-hero-box'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', () => navigateTo('works'));
+  });
+
+  // Top Nav Buttons (WORK)
+  ['nav-btn-work', 'nav-btn-archive', 'nav-works', 'works-link-work'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', () => navigateTo('works'));
+  });
 
   const worksLinkHome = document.getElementById('works-link-home');
   if (worksLinkHome) {
-    worksLinkHome.addEventListener('click', () => {
-      state.activePage = 'home';
-      state.currentViewMode = 'screen_8';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    worksLinkHome.addEventListener('click', () => navigateTo('home'));
   }
 
-  const worksSearchTrigger = document.getElementById('works-search-trigger');
-  if (worksSearchTrigger) {
-    worksSearchTrigger.addEventListener('click', openSearchModal);
-  }
 
   // Category filter tabs on Works page
   const filterBtns = document.querySelectorAll('.work-filter-btn');
@@ -224,6 +139,52 @@ function bindEvents() {
     btn.addEventListener('click', () => {
       state.activeCategoryFilter = btn.getAttribute('data-category');
       renderApp();
+    });
+  });
+
+  // Works Variant Selector buttons
+  const variantBtns = document.querySelectorAll('.works-variant-btn');
+  variantBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.worksCardStyle = btn.getAttribute('data-style');
+      renderApp();
+    });
+  });
+
+  // Works Aspect Ratio Selector buttons
+  const ratioBtns = document.querySelectorAll('.works-ratio-btn');
+  ratioBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.worksAspectRatio = btn.getAttribute('data-ratio');
+      renderApp();
+    });
+  });
+
+  // Home Hero Design Switcher buttons
+  const heroDesignBtns = document.querySelectorAll('.home-hero-btn');
+  heroDesignBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const design = btn.getAttribute('data-design');
+      if (design) {
+        state.homeHeroDesign = design;
+        renderApp();
+      }
+    });
+  });
+
+  // Work Detail Hero Design Switcher buttons
+  const detailHeroBtns = document.querySelectorAll('.detail-hero-btn');
+  detailHeroBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const design = btn.getAttribute('data-design');
+      if (design) {
+        state.detailHeroDesign = design;
+        renderApp();
+      }
     });
   });
 
@@ -235,41 +196,27 @@ function bindEvents() {
       if (e.target.closest('.card-carousel-btn') || e.target.closest('.card-dash-indicator')) {
         return; // NEVER open detail when interacting with carousel buttons or dash dots
       }
-      state.selectedWorkId = card.getAttribute('data-work-id');
-      state.dossierSlideIndex = state.cardSlideIndices[state.selectedWorkId] || 0;
-      state.activePage = 'detail';
-      if (state.currentViewMode === 'works' || state.currentViewMode === 'screen_8') {
-        state.currentViewMode = 'screen_7';
-      } else if (state.currentViewMode === 'screen_9') {
-        state.currentViewMode = 'screen_6';
-      }
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const workId = card.getAttribute('data-work-id');
+      navigateTo('detail', { workId });
     });
   });
 
-  // Detail Page Back Button -> Returns to Works Catalogue
-  const archiveBackHome = document.getElementById('archive-back-home');
-  if (archiveBackHome) {
-    archiveBackHome.addEventListener('click', () => {
-      state.activePage = 'works';
-      state.currentViewMode = 'works';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+  // Detail Page In-App Back Buttons (True Browser History Back)
+  ['archive-back-home', 'mobile-archive-back'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', () => handleGoBack('works'));
+  });
+
+  // About Page In-App Back Button
+  const aboutNavHome = document.getElementById('about-nav-home');
+  if (aboutNavHome) {
+    aboutNavHome.addEventListener('click', () => handleGoBack('home'));
   }
 
-  const mobileArchiveBack = document.getElementById('mobile-archive-back');
-  if (mobileArchiveBack) {
-    mobileArchiveBack.addEventListener('click', () => {
-      state.activePage = 'works';
-      state.currentViewMode = 'works';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+  // Contact Page In-App Back Button
+  const contactNavHome = document.getElementById('contact-nav-home');
+  if (contactNavHome) {
+    contactNavHome.addEventListener('click', () => handleGoBack('home'));
   }
 
   // Nav Buttons (ABOUT)
@@ -278,42 +225,17 @@ function bindEvents() {
     document.getElementById('works-link-about'),
     document.getElementById('about-link-about'),
     document.getElementById('nav-about'),
-    document.getElementById('drawer-nav-about'),
+    document.getElementById('contact-link-about')
   ];
   navAboutButtons.forEach(btn => {
-    if (btn) {
-      btn.addEventListener('click', () => {
-        state.activePage = 'about';
-        state.currentViewMode = 'about';
-        updateToolbarTabs();
-        renderApp();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    }
+    if (btn) btn.addEventListener('click', () => navigateTo('about'));
   });
 
-  // About Page Nav Events
-  const aboutNavHome = document.getElementById('about-nav-home');
-  if (aboutNavHome) {
-    aboutNavHome.addEventListener('click', () => {
-      state.activePage = 'home';
-      state.currentViewMode = 'screen_8';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  const aboutLinkWork = document.getElementById('about-link-work');
-  if (aboutLinkWork) {
-    aboutLinkWork.addEventListener('click', () => {
-      state.activePage = 'works';
-      state.currentViewMode = 'works';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
+  // Nav Buttons (WORK) from other pages
+  ['about-link-work', 'contact-link-work'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', () => navigateTo('works'));
+  });
 
   // Global Navigation: Contact Links
   const contactButtons = [
@@ -326,65 +248,12 @@ function bindEvents() {
     document.getElementById('contact-link-contact')
   ];
   contactButtons.forEach(btn => {
-    if (btn) {
-      btn.addEventListener('click', () => {
-        state.activePage = 'contact';
-        state.currentViewMode = 'contact';
-        updateToolbarTabs();
-        renderApp();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    }
+    if (btn) btn.addEventListener('click', () => navigateTo('contact'));
   });
-
-  // Contact Page Internal Navigation Links
-  const contactNavHome = document.getElementById('contact-nav-home');
-  if (contactNavHome) {
-    contactNavHome.addEventListener('click', () => {
-      state.activePage = 'works';
-      state.currentViewMode = 'works';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  const contactLinkWork = document.getElementById('contact-link-work');
-  if (contactLinkWork) {
-    contactLinkWork.addEventListener('click', () => {
-      state.activePage = 'works';
-      state.currentViewMode = 'works';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
-  const contactLinkAbout = document.getElementById('contact-link-about');
-  if (contactLinkAbout) {
-    contactLinkAbout.addEventListener('click', () => {
-      state.activePage = 'about';
-      state.currentViewMode = 'about';
-      updateToolbarTabs();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
 
   // Wire up Contact Form Validation & Transmission
   setupContactForm();
 
-  // Search Triggers
-  const searchTriggers = [
-    document.getElementById('nav-btn-search'),
-    document.getElementById('mobile-search-btn'),
-    document.getElementById('archive-search-trigger'),
-    document.getElementById('mobile-archive-search'),
-    document.getElementById('contact-search-trigger'),
-  ];
-  searchTriggers.forEach(btn => {
-    if (btn) btn.addEventListener('click', openSearchModal);
-  });
 
   // Mobile Drawer Menu Triggers
   const drawerTriggers = [
@@ -802,90 +671,6 @@ function setupMobileCarousel() {
   });
 }
 
-// Modal Handlers
-function openSearchModal() {
-  const container = document.getElementById('modal-container');
-  if (!container) return;
-  container.innerHTML = renderSearchModal();
-
-  const closeBtn = document.getElementById('search-modal-close');
-  const backdrop = document.getElementById('search-modal-backdrop');
-  const searchInput = document.getElementById('search-input');
-  const resultsList = document.getElementById('search-results-list');
-
-  const close = () => { container.innerHTML = ''; };
-  if (closeBtn) closeBtn.addEventListener('click', close);
-  if (backdrop) {
-    backdrop.addEventListener('click', (e) => {
-      if (e.target === backdrop) close();
-    });
-  }
-
-  // Live search filtering
-  if (searchInput && resultsList) {
-    searchInput.focus();
-    searchInput.addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      const allItems = ARCHIVE_DATA.works.map(w => ({
-        id: w.id,
-        title: `${w.title} (${w.year})`,
-        meta: `${w.subtitle} // ${w.venue}`,
-        target: 'detail'
-      }));
-
-      const filtered = allItems.filter(item => 
-        item.title.toLowerCase().includes(q) || item.meta.toLowerCase().includes(q)
-      );
-
-      if (filtered.length === 0) {
-        resultsList.innerHTML = `
-          <div class="p-6 text-center text-xs font-mono text-neutral-500">
-            NO ARCHIVE RECORDS MATCHING "${q.toUpperCase()}"
-          </div>
-        `;
-      } else {
-        resultsList.innerHTML = filtered.map(item => `
-          <div class="search-item p-3 border border-neutral-900 hover:border-neutral-700 hover:bg-neutral-900 cursor-pointer flex justify-between items-center transition-colors" data-work-id="${item.id}">
-            <div>
-              <div class="text-white font-bold text-sm uppercase font-brand">${item.title}</div>
-              <div class="text-[11px] text-neutral-400 font-mono">${item.meta}</div>
-            </div>
-            <span class="text-xs font-mono text-neutral-500">DETAIL →</span>
-          </div>
-        `).join('');
-
-        resultsList.querySelectorAll('.search-item').forEach(itemEl => {
-          itemEl.addEventListener('click', () => {
-            const workId = itemEl.getAttribute('data-work-id');
-            if (workId) {
-              state.selectedWorkId = workId;
-              state.activePage = 'detail';
-              state.currentViewMode = 'screen_7';
-              updateToolbarTabs();
-              renderApp();
-              close();
-            }
-          });
-        });
-      }
-    });
-
-    // Also bind existing initial items
-    resultsList.querySelectorAll('.search-item').forEach(itemEl => {
-      itemEl.addEventListener('click', () => {
-        const workId = itemEl.getAttribute('data-work-id');
-        if (workId) {
-          state.selectedWorkId = workId;
-          state.activePage = 'detail';
-          state.currentViewMode = 'screen_7';
-          updateToolbarTabs();
-          renderApp();
-          close();
-        }
-      });
-    });
-  }
-}
 
 function openLightbox(item) {
   const container = document.getElementById('modal-container');
@@ -916,214 +701,154 @@ function openMobileDrawer() {
   const navHome = document.getElementById('drawer-nav-home');
   if (navHome) {
     navHome.addEventListener('click', () => {
-      state.activePage = 'home';
-      state.currentViewMode = 'screen_9';
-      updateToolbarTabs();
-      renderApp();
       close();
+      navigateTo('home');
     });
   }
 
   const navArchive = document.getElementById('drawer-nav-archive');
   if (navArchive) {
     navArchive.addEventListener('click', () => {
-      state.activePage = 'works';
-      state.currentViewMode = 'works';
-      updateToolbarTabs();
-      renderApp();
       close();
+      navigateTo('works');
     });
   }
 
   const navAbout = document.getElementById('drawer-nav-about');
   if (navAbout) {
     navAbout.addEventListener('click', () => {
-      state.activePage = 'about';
-      state.currentViewMode = 'about';
-      updateToolbarTabs();
-      renderApp();
       close();
+      navigateTo('about');
     });
   }
 
   const navContact = document.getElementById('drawer-nav-contact');
   if (navContact) {
     navContact.addEventListener('click', () => {
-      state.activePage = 'contact';
-      state.currentViewMode = 'contact';
-      updateToolbarTabs();
-      renderApp();
       close();
+      navigateTo('contact');
     });
   }
 }
 
-// Screen Switcher Toolbar Logic
-function setupToolbar() {
-  const btnScr8 = document.getElementById('btn-screen-8');
-  const btnScr9 = document.getElementById('btn-screen-9');
-  const btnWorks = document.getElementById('btn-works');
-  const btnScr7 = document.getElementById('btn-screen-7');
-  const btnScr6 = document.getElementById('btn-screen-6');
-  const btnResp = document.getElementById('btn-responsive');
+// ============================================================================
+// Approach 1: Form Backend Service Integration (Web3Forms / Formspree)
+// ============================================================================
+// Configuration:
+// 1. Visit https://web3forms.com/ to get a free Access Key for kaensan@gmail.com.
+// 2. Insert key in WEB3FORMS_ACCESS_KEY below.
+// 3. Free tier includes 250 transmissions/month with anti-spam honeypot protection.
+const WEB3FORMS_ACCESS_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY';
 
-  if (btnScr8) {
-    btnScr8.addEventListener('click', () => {
-      state.currentViewMode = 'screen_8';
-      state.activePage = 'home';
-      updateToolbarTabs();
-      renderApp();
-    });
-  }
-
-  if (btnScr9) {
-    btnScr9.addEventListener('click', () => {
-      state.currentViewMode = 'screen_9';
-      state.activePage = 'home';
-      updateToolbarTabs();
-      renderApp();
-    });
-  }
-
-  if (btnWorks) {
-    btnWorks.addEventListener('click', () => {
-      state.currentViewMode = 'works';
-      state.activePage = 'works';
-      updateToolbarTabs();
-      renderApp();
-    });
-  }
-
-  const btnAbout = document.getElementById('btn-about');
-  if (btnAbout) {
-    btnAbout.addEventListener('click', () => {
-      state.currentViewMode = 'about';
-      state.activePage = 'about';
-      updateToolbarTabs();
-      renderApp();
-    });
-  }
-
-  const btnContact = document.getElementById('btn-contact');
-  if (btnContact) {
-    btnContact.addEventListener('click', () => {
-      state.currentViewMode = 'contact';
-      state.activePage = 'contact';
-      updateToolbarTabs();
-      renderApp();
-    });
-  }
-
-  if (btnScr7) {
-    btnScr7.addEventListener('click', () => {
-      state.currentViewMode = 'screen_7';
-      state.activePage = 'detail';
-      updateToolbarTabs();
-      renderApp();
-    });
-  }
-
-  if (btnScr6) {
-    btnScr6.addEventListener('click', () => {
-      state.currentViewMode = 'screen_6';
-      state.activePage = 'detail';
-      updateToolbarTabs();
-      renderApp();
-    });
-  }
-
-  if (btnResp) {
-    btnResp.addEventListener('click', () => {
-      state.currentViewMode = 'fluid';
-      updateToolbarTabs();
-      renderApp();
-    });
-  }
-}
-
-function updateToolbarTabs() {
-  const tabIds = {
-    'screen_8': 'btn-screen-8',
-    'screen_9': 'btn-screen-9',
-    'works': 'btn-works',
-    'about': 'btn-about',
-    'contact': 'btn-contact',
-    'screen_7': 'btn-screen-7',
-    'screen_6': 'btn-screen-6',
-    'fluid': 'btn-responsive',
-  };
-
-  Object.entries(tabIds).forEach(([mode, id]) => {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    const isCurrent = (state.currentViewMode === mode) || (mode === 'works' && state.activePage === 'works') || (mode === 'about' && state.activePage === 'about') || (mode === 'contact' && state.activePage === 'contact');
-    if (isCurrent) {
-      btn.className = 'screen-tab px-2 py-0.5 border border-white bg-white text-black font-semibold uppercase text-[10px] transition-colors';
-    } else {
-      btn.className = 'screen-tab px-2 py-0.5 border border-[#333333] hover:border-neutral-500 text-neutral-400 hover:text-white uppercase text-[10px] transition-colors';
-    }
-  });
-}
-
-// Setup Contact Form Validation and Simulated Dispatch
+// Setup Contact Form Validation and Service Dispatch
 function setupContactForm() {
   const form = document.getElementById('contact-enquiry-form');
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const nameInput = document.getElementById('contact-name');
+
+    // Anti-spam honeypot verification
+    const botcheck = form.querySelector('input[name="botcheck"]');
+    if (botcheck && botcheck.checked) {
+      console.warn('Bot submission blocked via honeypot.');
+      return;
+    }
+
     const emailInput = document.getElementById('contact-email');
     const messageInput = document.getElementById('contact-message');
-    const nameError = document.getElementById('name-error');
     const emailError = document.getElementById('email-error');
     const messageError = document.getElementById('message-error');
     const successBanner = document.getElementById('contact-success-banner');
+    const errorBanner = document.getElementById('contact-error-banner');
     const submitBtn = document.getElementById('contact-submit-btn');
 
+    // Reset previous notification states
     let isValid = true;
+    if (successBanner) successBanner.classList.add('hidden');
+    if (errorBanner) errorBanner.classList.add('hidden');
 
-    if (!nameInput.value.trim()) {
-      nameError.classList.remove('hidden');
-      nameInput.classList.add('border-red-500');
+    const emailValue = emailInput ? emailInput.value.trim() : '';
+    const messageValue = messageInput ? messageInput.value.trim() : '';
+
+    // Validate Email
+    if (!emailValue || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+      if (emailError) emailError.classList.remove('hidden');
+      if (emailInput) emailInput.classList.add('border-red-500');
       isValid = false;
     } else {
-      nameError.classList.add('hidden');
-      nameInput.classList.remove('border-red-500');
+      if (emailError) emailError.classList.add('hidden');
+      if (emailInput) emailInput.classList.remove('border-red-500');
     }
 
-    if (emailInput.value.trim() && !/^\S+@\S+\.\S+$/.test(emailInput.value.trim())) {
-      emailError.classList.remove('hidden');
-      emailInput.classList.add('border-red-500');
+    // Validate Message
+    if (!messageValue || messageValue.length < 2) {
+      if (messageError) messageError.classList.remove('hidden');
+      if (messageInput) messageInput.classList.add('border-red-500');
       isValid = false;
     } else {
-      emailError.classList.add('hidden');
-      emailInput.classList.remove('border-red-500');
-    }
-
-    if (!messageInput.value.trim()) {
-      messageError.classList.remove('hidden');
-      messageInput.classList.add('border-red-500');
-      isValid = false;
-    } else {
-      messageError.classList.add('hidden');
-      messageInput.classList.remove('border-red-500');
+      if (messageError) messageError.classList.add('hidden');
+      if (messageInput) messageInput.classList.remove('border-red-500');
     }
 
     if (!isValid) return;
 
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span>TRANSMITTING...</span>';
+    // Loading State
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="inline-block animate-spin mr-2">⟳</span><span>TRANSMITTING...</span>';
+    }
 
-    setTimeout(() => {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<span>SUBMIT ENQUIRY</span><span class="group-hover:translate-x-1 transition-transform">→</span>';
+    try {
+      // If Web3Forms Access Key is provided, dispatch directly via Web3Forms API
+      if (WEB3FORMS_ACCESS_KEY && WEB3FORMS_ACCESS_KEY !== 'YOUR_WEB3FORMS_ACCESS_KEY') {
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            access_key: WEB3FORMS_ACCESS_KEY,
+            email: emailValue,
+            message: messageValue,
+            subject: `[KAENSAN ARCHIVE] New Inquiry from ${emailValue}`,
+            from_name: 'Kaensan Archive Portal'
+          })
+        });
+
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error(data.message || 'Form submission failed');
+        }
+      } else {
+        // Institutional dispatch simulation (for local preview / development)
+        await new Promise((resolve) => setTimeout(resolve, 600));
+      }
+
+      // Success Display
       if (successBanner) {
         successBanner.classList.remove('hidden');
         successBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
       form.reset();
-    }, 600);
+    } catch (err) {
+      console.error('Contact Form Transmission Error:', err);
+      // Fallback Display with direct mailto
+      if (errorBanner) {
+        const desc = document.getElementById('contact-error-desc');
+        if (desc) {
+          desc.innerHTML = `Unable to dispatch via automated service. Please contact directly at <a href="mailto:kaensan@gmail.com?subject=Archive%20Inquiry%20from%20${encodeURIComponent(emailValue)}&body=${encodeURIComponent(messageValue)}" class="text-white underline font-bold">kaensan@gmail.com</a>.`;
+        }
+        errorBanner.classList.remove('hidden');
+        errorBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>SUBMIT ENQUIRY</span><span class="group-hover:translate-x-1 transition-transform">→</span>';
+      }
+    }
   });
 }
 
@@ -1133,19 +858,14 @@ window.addEventListener('keydown', (e) => {
     const container = document.getElementById('modal-container');
     if (container) container.innerHTML = '';
   }
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-    e.preventDefault();
-    openSearchModal();
-  }
-  if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
-    e.preventDefault();
-    openSearchModal();
-  }
 });
 
-// Window resize handler for fluid mode
+// Window resize handler (adapts layout across mobile/desktop boundary)
+let lastIsMobile = window.innerWidth < 768;
 window.addEventListener('resize', () => {
-  if (state.currentViewMode === 'fluid') {
+  const currentIsMobile = window.innerWidth < 768;
+  if (currentIsMobile !== lastIsMobile) {
+    lastIsMobile = currentIsMobile;
     renderApp();
   }
 });
@@ -1159,18 +879,18 @@ function syncFromUrl() {
     state.activePage = p;
     if (p === 'detail' && w) {
       state.selectedWorkId = w;
+      state.dossierSlideIndex = state.cardSlideIndices[w] || 0;
     }
   }
 }
 
-// Global exposure for programmatic navigation & PDF capture
+// Global exposure for programmatic navigation & testing
 window.__appState = state;
 window.__renderApp = renderApp;
+window.__navigateTo = navigateTo;
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
   syncFromUrl();
-  setupToolbar();
   renderApp();
-  setInterval(updateLiveClocks, 1000);
 });
