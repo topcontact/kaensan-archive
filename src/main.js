@@ -5,6 +5,7 @@ import { renderAboutPage } from './components/about.js';
 import { renderContactPage } from './components/contact.js';
 import { renderLightboxModal, renderMobileNavDrawer, toggleAudioSoundscape } from './components/modals.js';
 import { ARCHIVE_DATA } from './data.js';
+import { fetchLiveArchiveData, subscribeArchive } from './sanity/api.js';
 
 // Application State
 const state = {
@@ -893,4 +894,12 @@ window.__navigateTo = navigateTo;
 document.addEventListener('DOMContentLoaded', () => {
   syncFromUrl();
   renderApp();
+
+  // Reactive subscription for Sanity CMS real-time sync
+  subscribeArchive(() => {
+    renderApp();
+  });
+
+  // Asynchronously fetch latest data from Sanity CMS if configured
+  fetchLiveArchiveData();
 });

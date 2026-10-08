@@ -1,4 +1,6 @@
 import { renderFooter } from './footer.js';
+import { ARCHIVE_DATA } from '../data.js';
+import { archiveStore } from '../sanity/api.js';
 
 /**
  * Contact Page Component
@@ -7,6 +9,18 @@ import { renderFooter } from './footer.js';
  * Designed in full alignment with the project's brutalist architectural museum theme
  */
 export function renderContactPage() {
+  const c = archiveStore.contact || {};
+  const artistName = c.artistIdentity || ARCHIVE_DATA.artist?.name || 'KAENSAN RATTANASOMRERK';
+  const headline = c.headline || 'For exhibition commissions, curatorial essays, museum installations, film festivals, and archival acquisitions.';
+  const tel = c.telephone || '(66)85-902-1411';
+  const email1 = c.emailPrimary || 'kaensan@gmail.com';
+  const email2 = c.emailSecondary || 'kaensan@me.com';
+  const skype = c.skype || 'Kaensan';
+  const line = c.line || 'Kaensan';
+  const studioLoc = c.studioLocation || 'Bangkok, Thailand';
+  const academic = c.academicNotice || ARCHIVE_DATA.artist?.lectureship || 'Thammasat University (2020—2024)';
+  const archivalNotice = c.archivalNotice || 'Inquiries regarding permanent museum installations and archival plates are reviewed within 48 business hours.';
+
   return `
     <div class="min-h-screen bg-black text-[#F0F0F0] selection:bg-white selection:text-black select-none flex flex-col justify-between">
       
@@ -68,10 +82,10 @@ export function renderContactPage() {
             <div>
               <div class="text-sm font-mono uppercase tracking-widest text-neutral-500 mb-2 font-bold">ARTIST & FILMMAKER</div>
               <h2 class="text-2xl sm:text-3xl font-black font-brand uppercase tracking-tight text-white mb-2">
-                KAENSAN RATTANASOMRERK
+                ${artistName}
               </h2>
               <p class="text-sm sm:text-base text-neutral-300 font-sans leading-relaxed">
-                For exhibition commissions, curatorial essays, museum installations, film festivals, and archival acquisitions.
+                ${headline}
               </p>
             </div>
 
@@ -81,52 +95,54 @@ export function renderContactPage() {
               <!-- Telephone -->
               <div class="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 hover:bg-[#0c0c0c] transition-colors">
                 <span class="text-neutral-500 uppercase tracking-widest text-sm font-bold">TELEPHONE</span>
-                <a href="tel:+66859021411" class="text-white hover:text-neutral-300 transition-colors font-bold tracking-wider">
-                  (66)85-902-1411
+                <a href="tel:${tel.replace(/[^0-9+]/g, '')}" class="text-white hover:text-neutral-300 transition-colors font-bold tracking-wider">
+                  ${tel}
                 </a>
               </div>
 
-              <!-- Electronic Mail (Both addresses from kaensan.com/contact) -->
+              <!-- Electronic Mail -->
               <div class="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1.5 hover:bg-[#0c0c0c] transition-colors">
                 <span class="text-neutral-500 uppercase tracking-widest text-sm font-bold">ELECTRONIC MAIL</span>
                 <div class="flex flex-col sm:items-end gap-1">
-                  <a href="mailto:kaensan@gmail.com" class="text-white hover:text-neutral-300 transition-colors font-medium">
-                    kaensan@gmail.com
+                  <a href="mailto:${email1}" class="text-white hover:text-neutral-300 transition-colors font-medium">
+                    ${email1}
                   </a>
+                  ${email2 ? `
                   <span class="text-neutral-600 text-sm hidden sm:inline">/</span>
-                  <a href="mailto:kaensan@me.com" class="text-neutral-300 hover:text-white transition-colors font-medium">
-                    kaensan@me.com
+                  <a href="mailto:${email2}" class="text-neutral-300 hover:text-white transition-colors font-medium">
+                    ${email2}
                   </a>
+                  ` : ''}
                 </div>
               </div>
 
               <!-- Instant Messaging Channels -->
               <div class="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 hover:bg-[#0c0c0c] transition-colors">
                 <span class="text-neutral-500 uppercase tracking-widest text-sm font-bold">SKYPE</span>
-                <span class="text-white font-medium">Kaensan</span>
+                <span class="text-white font-medium">${skype}</span>
               </div>
 
               <div class="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 hover:bg-[#0c0c0c] transition-colors">
                 <span class="text-neutral-500 uppercase tracking-widest text-sm font-bold">LINE</span>
-                <span class="text-white font-medium">Kaensan</span>
+                <span class="text-white font-medium">${line}</span>
               </div>
 
               <!-- Studio Location -->
               <div class="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 hover:bg-[#0c0c0c] transition-colors">
                 <span class="text-neutral-500 uppercase tracking-widest text-sm font-bold">STUDIO LOCATION</span>
-                <span class="text-white">Bangkok, Thailand</span>
+                <span class="text-white">${studioLoc}</span>
               </div>
 
               <!-- Academic Appointment -->
               <div class="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 hover:bg-[#0c0c0c] transition-colors">
                 <span class="text-neutral-500 uppercase tracking-widest text-sm font-bold">ACADEMIC</span>
-                <span class="text-neutral-300">Thammasat University (2020—2024)</span>
+                <span class="text-neutral-300">${academic}</span>
               </div>
             </div>
 
             <!-- Archival Notice Badge -->
             <div class="border-l-2 border-white/40 pl-4 py-1.5 text-sm font-mono text-neutral-300">
-              <span class="text-white font-bold uppercase">INSTITUTIONAL ARCHIVE:</span> Inquiries regarding permanent museum installations and archival plates are reviewed within 48 business hours.
+              <span class="text-white font-bold uppercase">INSTITUTIONAL ARCHIVE:</span> ${archivalNotice}
             </div>
 
           </div>

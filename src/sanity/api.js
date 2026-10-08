@@ -1,0 +1,176 @@
+import { sanityClient, isSanityConfigured, urlFor } from './client.js';
+import { RAW_ARCHIVE_DATA, setArchiveData } from '../data.js';
+
+/**
+ * Global reactive data store
+ * Initialized with local fallback data for zero-latency instant render
+ */
+export const archiveStore = {
+  data: { ...RAW_ARCHIVE_DATA },
+  timeline: [],
+  contact: null,
+  siteSettings: null,
+  isLive: false,
+  subscribers: new Set(),
+};
+
+/**
+ * Subscribe to data changes (e.g. when Sanity data arrives)
+ * @param {Function} callback 
+ * @returns {Function} unsubscribe
+ */
+export function subscribeArchive(callback) {
+  archiveStore.subscribers.add(callback);
+  return () => archiveStore.subscribers.delete(callback);
+}
+
+function notifySubscribers() {
+  archiveStore.subscribers.forEach((cb) => {
+    try {
+      cb(archiveStore.data);
+    } catch (e) {
+      console.error('[ArchiveStore] Subscriber notification error:', e);
+    }
+  });
+}
+
+/**
+ * Transform Sanity Work document into template work structure
+ */
+function transformSanityWork(doc) {
+  const coverUrl = doc.coverImage?.asset ? urlFor(doc.coverImage).url() : '';
+  const plateUrl = doc.plateImage?.asset ? urlFor(doc.plateImage).url() : coverUrl;
+
+  const gallery = Array.isArray(doc.galleryImages)
+    ? doc.galleryImages.map((img) => ({
+        url: img.asset ? urlFor(img).url() : '',
+        title: img.title || '',
+        alt: img.alt || doc.title || '',
+      }))
+    : [];
+
+  return {
+    id: doc.slug?.current || doc._id,
+    number: doc.number || '01',
+    title: doc.title || 'UNTITLED',
+    subtitle: doc.subtitle || '',
+    year: doc.year || '2024',
+    category: doc.category || 'CONTEMPORARY ART',
+    medium: doc.medium || '',
+    dimensions: doc.dimensions || '',
+    duration: doc.duration || '',
+    components: doc.components || '',
+    venue: doc.venue || '',
+    curator: doc.curator || '',
+    status: doc.status || 'ARCHIVED',
+    image: coverUrl,
+    plate: plateUrl,
+    images: gallery,
+    imageAlt: doc.coverImage?.alt || doc.title || 'Work documentation',
+    summary: doc.summary || '',
+    statement: doc.statement || '',
+  };
+}
+
+/**
+ * Fetch all content live from Sanity CMS
+ */
+export async function fetchLiveArchiveData() {
+  if (!isSanityConfigured || !sanityClient) {
+    console.info('[Sanity] No project ID configured. Using authentic local archive dataset.');
+    return archiveStore.data;
+  }
+
+  try {
+    const query = `{
+      "works": *[_type == "work"] | order(order asc, year desc) {
+        ...,
+        "slug": slug.current,
+        coverImage { ..., asset-> },
+        plateImage { ..., asset-> },
+        galleryImages[] { ..., asset-> }
+      },
+      "artist": *[_type == "artist"][0] {
+        ...,
+        profileImage { ..., asset-> }
+      },
+      "exhibitions": *[_type == "exhibition"] | order(year desc, order asc),
+      "contact": *[_type == "contactInfo"][0],
+      "settings": *[_type == "siteSettings"][0] {
+        ...,
+        currentExhibition {
+          ...,
+          featuredWork-> {
+            ...,
+            coverImage { ..., asset-> }
+          }
+        }
+      }
+    }`;
+
+    const result = await sanityClient.fetch(query);
+
+    if (result && result.works && result.works.length > 0) {
+      const transformedWorks = result.works.map(transformSanityWork);
+      
+      // Determine current exhibition hero
+      let currentExhibition = RAW_ARCHIVE_DATA.currentExhibition;
+      if (result.settings?.currentExhibition) {
+        const ce = result.settings.currentExhibition;
+        const fw = ce.featuredWork ? transformSanityWork(ce.featuredWork) : transformedWorks[0];
+        currentExhibition = {
+          id: fw.id,
+          title: ce.customTitle || fw.title,
+          subtitle: ce.customSubtitle || fw.subtitle,
+          heroImage: fw.image,
+          heroAlt: fw.imageAlt,
+          venue: ce.customVenue || fw.venue,
+          curator: ce.customCurator || fw.curator,
+          year: fw.year,
+          status: ce.customStatus || fw.status,
+          dates: ce.customDates || '',
+          city: ce.customCity || 'BANGKOK, TH',
+        };
+      }
+
+      // Update store
+      const updatedData = {
+        currentExhibition,
+        artist: result.artist ? {
+          ...RAW_ARCHIVE_DATA.artist,
+          name: result.artist.name || RAW_ARCHIVE_DATA.artist.name,
+          born: result.artist.born || RAW_ARCHIVE_DATA.artist.born,
+          discipline: result.artist.discipline || RAW_ARCHIVE_DATA.artist.discipline,
+          biography: result.artist.biography || RAW_ARCHIVE_DATA.artist.biography,
+          education: result.artist.education || RAW_ARCHIVE_DATA.artist.education,
+          residencies: result.artist.residencies || RAW_ARCHIVE_DATA.artist.residencies,
+          lectureship: result.artist.lectureship || RAW_ARCHIVE_DATA.artist.lectureship,
+        } : RAW_ARCHIVE_DATA.artist,
+        works: transformedWorks,
+      };
+
+      archiveStore.data = updatedData;
+      setArchiveData(updatedData);
+
+      archiveStore.timeline = result.exhibitions || [];
+      archiveStore.contact = result.contact || null;
+      archiveStore.siteSettings = result.settings || null;
+      archiveStore.isLive = true;
+
+      console.info('[Sanity] Successfully synchronized with Sanity CMS.');
+      notifySubscribers();
+    }
+  } catch (error) {
+    console.warn('[Sanity] Fetch failed. Gracefully maintaining authentic local dataset.', error);
+  }
+
+  return archiveStore.data;
+}
+
+/**
+ * Access work by ID from reactive store
+ */
+export function getWorkFromStore(id) {
+  const works = archiveStore.data.works || RAW_ARCHIVE_DATA.works;
+  return works.find((w) => w.id === id) || works[0];
+}

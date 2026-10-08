@@ -1,13 +1,12 @@
 import { renderFooter } from './footer.js';
+import { ARCHIVE_DATA } from '../data.js';
+import { archiveStore } from '../sanity/api.js';
+import { urlFor } from '../sanity/client.js';
 
 /**
- * About Page Component
- * Complete curatorial biography, education, exhibition timeline (2012—2024),
- * artist residencies, and film/biennale work experience for KAENSAN RATTANASOMRERK
- * Sourced directly from official 2024 CV and Works documentation
+ * Default Curatorial Timeline Data
  */
-export function renderAboutPage() {
-  const timelineData = [
+const defaultTimelineData = [
     {
       year: '2024',
       items: [
@@ -225,6 +224,43 @@ export function renderAboutPage() {
     }
   ];
 
+/**
+ * About Page Component
+ * Complete curatorial biography, education, exhibition timeline (2012—2024),
+ * artist residencies, and film/biennale work experience
+ */
+export function renderAboutPage() {
+  const artist = ARCHIVE_DATA.artist || {};
+  let timelineData = defaultTimelineData;
+
+  if (archiveStore.timeline && archiveStore.timeline.length > 0) {
+    const grouped = {};
+    archiveStore.timeline.forEach((item) => {
+      const y = item.year || '2024';
+      if (!grouped[y]) grouped[y] = [];
+      grouped[y].push({
+        title: item.title,
+        exhibition: item.exhibitionName || 'Exhibition',
+        venue: item.venue || '',
+        location: item.location || '',
+      });
+    });
+    timelineData = Object.keys(grouped)
+      .sort((a, b) => Number(b) - Number(a))
+      .map((year) => ({
+        year,
+        items: grouped[year],
+      }));
+  }
+
+  const profileImg = artist.profileImage ? urlFor(artist.profileImage).url() : '/assets/kaensan_portrait.jpg';
+  const artistName = artist.name || 'KAENSAN RATTANASOMRERK';
+  const born = artist.born || '1989, Bangkok, TH';
+  const academic = artist.lectureship || 'Lecturer, Thammasat (2020–2024)';
+  const eduMa = artist.education?.[0] ? `${artist.education[0].institution} (${artist.education[0].year})` : 'Chiang Mai Univ (2023)';
+  const eduBa = artist.education?.[1] ? `${artist.education[1].institution} (${artist.education[1].year})` : 'Thammasat Univ (2012)';
+  const residencies = artist.residencies?.[0] ? artist.residencies[0].location : 'BKK, Thailand';
+
   return `
     <div class="min-h-screen bg-black text-[#F0F0F0] selection:bg-white selection:text-black select-none">
       
@@ -271,37 +307,37 @@ export function renderAboutPage() {
             <div class="border border-neutral-700 bg-neutral-950 p-2 shadow-2xl max-w-[280px] sm:max-w-xs w-full mx-auto lg:mx-0">
               <div class="relative aspect-[3/4] bg-black overflow-hidden border border-neutral-800 flex items-center justify-center">
                 <img 
-                  src="/assets/kaensan_portrait.jpg" 
-                  alt="Kaensan Rattanasomrerk — Portrait" 
+                  src="${profileImg}" 
+                  alt="${artistName} — Portrait" 
                   class="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700 ease-out"
                 />
                 <div class="absolute bottom-2 left-2 bg-black/85 backdrop-blur px-3 py-1 text-sm font-mono tracking-widest text-neutral-300 border border-white/10">
-                  KAENSAN RATTANASOMRERK
+                  ${artistName.toUpperCase()}
                 </div>
               </div>
             </div>
 
-            <!-- Artist Fact Sheet (Exact 2024 CV data) -->
+            <!-- Artist Fact Sheet -->
             <div class="border border-[#222222] bg-[#070707] divide-y divide-[#1c1c1c] text-sm font-mono w-full">
               <div class="p-3 sm:p-3.5 flex justify-between items-center">
                 <span class="text-neutral-500 uppercase text-sm">BORN</span>
-                <span class="text-white text-right">1989, Bangkok, TH</span>
+                <span class="text-white text-right">${born}</span>
               </div>
               <div class="p-3 sm:p-3.5 flex justify-between items-center">
                 <span class="text-neutral-500 uppercase text-sm">EDUCATION (MA)</span>
-                <span class="text-white text-right">Chiang Mai Univ (2023)</span>
+                <span class="text-white text-right">${eduMa}</span>
               </div>
               <div class="p-3 sm:p-3.5 flex justify-between items-center">
                 <span class="text-neutral-500 uppercase text-sm">EDUCATION (BA)</span>
-                <span class="text-white text-right">Thammasat Univ (2012)</span>
+                <span class="text-white text-right">${eduBa}</span>
               </div>
               <div class="p-3 sm:p-3.5 flex justify-between items-center">
                 <span class="text-neutral-500 uppercase text-sm">ACADEMIC</span>
-                <span class="text-white text-right">Lecturer, Thammasat (2020–2024)</span>
+                <span class="text-white text-right">${academic}</span>
               </div>
               <div class="p-3 sm:p-3.5 flex justify-between items-center">
                 <span class="text-neutral-500 uppercase text-sm">RESIDENCIES</span>
-                <span class="text-white text-right">BKK, Thailand</span>
+                <span class="text-white text-right">${residencies}</span>
               </div>
             </div>
           </div>
@@ -314,26 +350,26 @@ export function renderAboutPage() {
             </div>
 
             <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black font-brand uppercase tracking-tighter text-white mb-3 sm:mb-6 leading-tight">
-              KAENSAN<br class="hidden sm:inline" /> RATTANASOMRERK
+              ${artistName.toUpperCase()}
             </h1>
 
             <div class="text-sm sm:text-base font-mono text-neutral-400 tracking-wider uppercase mb-6 sm:mb-8 border-l-2 border-white pl-3 sm:pl-4">
-              ARTIST & FILMMAKER // BANGKOK, THAILAND
+              ${artist.discipline || 'ARTIST & FILMMAKER'} // ${born.toUpperCase()}
             </div>
 
-            <!-- Authentic Biography Text (Verbatim from 2024 CV) -->
+            <!-- Authentic Biography Text -->
             <div class="space-y-4 sm:space-y-6 text-sm sm:text-base md:text-lg text-neutral-300 font-sans leading-[1.8] font-normal">
-              <p>
-                <strong class="text-white font-semibold">Kaensan Rattanasomrerk</strong> was born in 1989 in Bangkok, Thailand. He graduated from Thammasat University with a Bachelor of Arts in Journalism and Mass Communication, Film Department. He later pursued a Master of Arts in Visual Arts from the Faculty of Fine Arts at Chiang Mai University.
-              </p>
-
-              <p>
-                He utilizes moving images as a tool to address contemporary social issues. He possesses extensive knowledge and experience in filmmaking and visual arts; his artworks mainly stem from collaborations between moving images and other fields of study.
-              </p>
-
-              <p>
-                He is highly motivated to work cross-media with local communities and scientists. His works have been exhibited across <strong class="text-white">Germany, Japan, Taiwan, Singapore, and Thailand</strong>, including solo presentations at Edith Russ Haus, Museum of Something, and Treasure Hill Artist Village.
-              </p>
+              ${artist.biography ? artist.biography.split('\n\n').map(p => `<p>${p}</p>`).join('') : `
+                <p>
+                  <strong class="text-white font-semibold">Kaensan Rattanasomrerk</strong> was born in 1989 in Bangkok, Thailand. He graduated from Thammasat University with a Bachelor of Arts in Journalism and Mass Communication, Film Department. He later pursued a Master of Arts in Visual Arts from the Faculty of Fine Arts at Chiang Mai University.
+                </p>
+                <p>
+                  He utilizes moving images as a tool to address contemporary social issues. He possesses extensive knowledge and experience in filmmaking and visual arts; his artworks mainly stem from collaborations between moving images and other fields of study.
+                </p>
+                <p>
+                  He is highly motivated to work cross-media with local communities and scientists. His works have been exhibited across <strong class="text-white">Germany, Japan, Taiwan, Singapore, and Thailand</strong>, including solo presentations at Edith Russ Haus, Museum of Something, and Treasure Hill Artist Village.
+                </p>
+              `}
             </div>
           </div>
         </section>

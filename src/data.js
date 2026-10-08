@@ -4,7 +4,7 @@
  * Artist: Kaensan Rattanasomrerk (b. 1989, Bangkok, Thailand)
  */
 
-export const ARCHIVE_DATA = {
+export const RAW_ARCHIVE_DATA = {
   currentExhibition: {
     id: 'heavy-metal-2023',
     title: 'HEAVY METAL — 2023',
@@ -414,7 +414,41 @@ The installation incorporates domestic items—stools and window curtains—to e
   ]
 };
 
+let activeData = { ...RAW_ARCHIVE_DATA };
+
+/**
+ * Dynamically update archive dataset (e.g. from Sanity CMS)
+ * @param {object} newData 
+ */
+export function setArchiveData(newData) {
+  activeData = { ...activeData, ...newData };
+}
+
+/**
+ * ARCHIVE_DATA is a live reactive proxy that resolves to activeData,
+ * ensuring all legacy/existing components automatically receive fresh CMS data without code changes!
+ */
+export const ARCHIVE_DATA = new Proxy({}, {
+  get(target, prop) {
+    return activeData[prop];
+  },
+  set(target, prop, val) {
+    activeData[prop] = val;
+    return true;
+  },
+  has(target, prop) {
+    return prop in activeData;
+  },
+  ownKeys(target) {
+    return Reflect.ownKeys(activeData);
+  },
+  getOwnPropertyDescriptor(target, prop) {
+    return Object.getOwnPropertyDescriptor(activeData, prop);
+  }
+});
+
 // Helper to get detailed work data
 export function getWorkById(id) {
-  return ARCHIVE_DATA.works.find(w => w.id === id) || ARCHIVE_DATA.works[0];
+  const works = activeData.works || RAW_ARCHIVE_DATA.works;
+  return works.find(w => w.id === id) || works[0];
 }

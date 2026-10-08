@@ -30,4 +30,3 @@ pdf_exports/
 exports/
 scripts/
 .vercel
-.env*
