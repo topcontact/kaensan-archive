@@ -1,5 +1,5 @@
 import { createClient } from '@sanity/client';
-import imageUrlBuilder from '@sanity/image-url';
+import { createImageUrlBuilder } from '@sanity/image-url';
 
 // Environment variables from Vite (.env / .env.local)
 export const SANITY_PROJECT_ID = import.meta.env.VITE_SANITY_PROJECT_ID || '';
@@ -25,7 +25,7 @@ export const sanityClient = isSanityConfigured
   : null;
 
 // Image URL Builder for Sanity Assets
-const imageBuilder = isSanityConfigured && sanityClient ? imageUrlBuilder(sanityClient) : null;
+const imageBuilder = isSanityConfigured && sanityClient ? createImageUrlBuilder(sanityClient) : null;
 
 /**
  * Generate optimized image URL from Sanity asset

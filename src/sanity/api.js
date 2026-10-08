@@ -38,16 +38,19 @@ function notifySubscribers() {
  * Transform Sanity Work document into template work structure
  */
 function transformSanityWork(doc) {
-  const coverUrl = doc.coverImage?.asset ? urlFor(doc.coverImage).url() : '';
-  const plateUrl = doc.plateImage?.asset ? urlFor(doc.plateImage).url() : coverUrl;
+  const workId = doc.slug?.current || doc.slug || doc._id;
+  const localMatch = RAW_ARCHIVE_DATA.works.find((w) => w.id === workId);
 
-  const gallery = Array.isArray(doc.galleryImages)
+  const coverUrl = doc.coverImage?.asset ? urlFor(doc.coverImage).url() : (localMatch ? localMatch.image : '');
+  const plateUrl = doc.plateImage?.asset ? urlFor(doc.plateImage).url() : (localMatch ? localMatch.plate : coverUrl);
+
+  const gallery = (Array.isArray(doc.galleryImages) && doc.galleryImages.length > 0)
     ? doc.galleryImages.map((img) => ({
-        url: img.asset ? urlFor(img).url() : '',
+        url: img.asset ? urlFor(img).url() : (img.url || ''),
         title: img.title || '',
         alt: img.alt || doc.title || '',
       }))
-    : [];
+    : (localMatch?.images || []);
 
   return {
     id: doc.slug?.current || doc._id,
