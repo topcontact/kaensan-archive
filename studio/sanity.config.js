@@ -7,7 +7,7 @@ export default defineConfig({
   name: 'default',
   title: 'Artist Portfolio & Archive Studio',
 
-  projectId: process.env.SANITY_STUDIO_PROJECT_ID || 'your_project_id',
+  projectId: process.env.SANITY_STUDIO_PROJECT_ID || 'mvvl7y27',
   dataset: process.env.SANITY_STUDIO_DATASET || 'production',
 
   plugins: [

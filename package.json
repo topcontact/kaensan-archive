@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "studio": "npm run dev --prefix studio",
+    "studio:build": "npm run build --prefix studio",
+    "studio:deploy": "npm run deploy --prefix studio"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
