@@ -103,9 +103,12 @@ export async function fetchLiveArchiveData() {
         ...,
         currentExhibition {
           ...,
+          customHeroImage { ..., asset-> },
           featuredWork-> {
             ...,
-            coverImage { ..., asset-> }
+            "slug": slug.current,
+            coverImage { ..., asset-> },
+            plateImage { ..., asset-> }
           }
         }
       }
@@ -116,23 +119,30 @@ export async function fetchLiveArchiveData() {
     if (result && result.works && result.works.length > 0) {
       const transformedWorks = result.works.map(transformSanityWork);
       
-      // Determine current exhibition hero
+      // Determine current exhibition hero (Automatic work fallback + optional custom overrides)
       let currentExhibition = RAW_ARCHIVE_DATA.currentExhibition;
       if (result.settings?.currentExhibition) {
         const ce = result.settings.currentExhibition;
         const fw = ce.featuredWork ? transformSanityWork(ce.featuredWork) : transformedWorks[0];
+        
+        // Custom hero image override if provided, else use the work's image
+        const heroImg = ce.customHeroImage?.asset ? urlFor(ce.customHeroImage).url() : fw.image;
+        
+        // Default title format: "TITLE — YEAR" (e.g. "HEAVY METAL — 2023")
+        const defaultTitle = fw.year && !fw.title.includes(fw.year) ? `${fw.title} — ${fw.year}` : fw.title;
+
         currentExhibition = {
           id: fw.id,
-          title: ce.customTitle || fw.title,
-          subtitle: ce.customSubtitle || fw.subtitle,
-          heroImage: fw.image,
-          heroAlt: fw.imageAlt,
-          venue: ce.customVenue || fw.venue,
-          curator: ce.customCurator || fw.curator,
-          year: fw.year,
-          status: ce.customStatus || fw.status,
-          dates: ce.customDates || '',
-          city: ce.customCity || 'BANGKOK, TH',
+          title: ce.customTitle?.trim() ? ce.customTitle : defaultTitle,
+          subtitle: ce.customSubtitle?.trim() ? ce.customSubtitle : (fw.subtitle || fw.medium || ''),
+          heroImage: heroImg,
+          heroAlt: fw.imageAlt || fw.title,
+          venue: ce.customVenue?.trim() ? ce.customVenue : (fw.venue || ''),
+          curator: ce.customCurator?.trim() ? ce.customCurator : (fw.curator || ''),
+          year: fw.year || '2023',
+          status: ce.customStatus?.trim() ? ce.customStatus : (fw.status || 'PERMANENT ARCHIVE'),
+          dates: ce.customDates?.trim() ? ce.customDates : '',
+          city: ce.customCity?.trim() ? ce.customCity : 'BANGKOK, TH',
         };
       }
 

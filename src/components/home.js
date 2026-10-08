@@ -134,7 +134,7 @@ function renderHeroMonolith(exhibition, isMobile) {
         <div class="w-full mt-5 flex flex-col gap-3">
           <div>
             <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-1">
-              FEATURED EXHIBITION // 2023
+              FEATURED EXHIBITION // ${exhibition.year || '2023'}
             </div>
             <h1 class="text-2xl sm:text-3xl font-black font-brand uppercase tracking-tight text-white leading-tight mb-1">
               ${exhibition.title}
@@ -179,7 +179,7 @@ function renderHeroMonolith(exhibition, isMobile) {
         <!-- Left Column: Kicker, Headline, Subhead, Venue -->
         <div class="min-w-0 flex-1">
           <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-2">
-            FEATURED EXHIBITION // 2023
+            FEATURED EXHIBITION // ${exhibition.year || '2023'}
           </div>
           <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black font-brand uppercase tracking-tighter text-white leading-tight mb-2">
             ${exhibition.title}
