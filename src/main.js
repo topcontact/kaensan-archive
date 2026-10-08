@@ -960,6 +960,22 @@ window.addEventListener('keydown', (e) => {
     const container = document.getElementById('modal-container');
     if (container) container.innerHTML = '';
   }
+  if (state.activePage === 'home') {
+    const targetWorkId = ARCHIVE_DATA.currentExhibition?.id || 'heavy-metal-2023';
+    const work = getWorkById(targetWorkId);
+    let totalImages = (work && Array.isArray(work.images) && work.images.length > 0) ? work.images.length : 1;
+    if (work && work.plate && work.plate !== work.image && totalImages === 1) totalImages = 2;
+
+    if (totalImages > 1) {
+      if (e.key === 'ArrowLeft') {
+        state.homeSlideIndex = (state.homeSlideIndex - 1 + totalImages) % totalImages;
+        renderApp();
+      } else if (e.key === 'ArrowRight') {
+        state.homeSlideIndex = (state.homeSlideIndex + 1) % totalImages;
+        renderApp();
+      }
+    }
+  }
 });
 
 // Window resize handler (adapts layout across mobile/desktop boundary)

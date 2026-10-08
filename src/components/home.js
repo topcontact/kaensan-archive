@@ -141,7 +141,7 @@ function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
 
   if (isMobile) {
     return `
-      <!-- Mobile View: Pure 16:9 Monolith -->
+      <!-- Mobile View: Pure Minimal Monolith (Zero Clutter on Canvas) -->
       <main class="w-full flex-1 flex flex-col justify-center items-center px-4 sm:px-6 py-5 sm:py-6 my-auto">
         <!-- Strict 16:9 Floating Art Canvas (Click goes to detail) -->
         <div 
@@ -149,26 +149,13 @@ function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
           id="monolith-hero-box"
           data-work-id="${targetWorkId}"
         >
-          <!-- Color reveal on hover/touch: Default grayscale, group-hover reveals original color -->
+          <!-- Color reveal on touch/hover: Default grayscale, reveals full color on hover/touch -->
           <img 
             id="home-hero-img"
             src="${activeImage.url}" 
             alt="${activeImage.alt || exhibition.heroAlt}" 
             class="w-full h-full object-cover object-center filter grayscale contrast-125 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700 ease-out group-hover:scale-[1.02]"
           />
-
-          <!-- Top-Left Badge: Year Stamp -->
-          <div class="absolute top-3 left-3 border border-[#333333] bg-black/85 backdrop-blur-md px-2.5 py-1 text-xs font-mono tracking-widest text-neutral-300 pointer-events-none z-20">
-            ${exhibition.year || '2023'}
-          </div>
-
-          ${hasMultipleImages ? `
-            <!-- Top-Right Photo Index Indicator -->
-            <div class="absolute top-3 right-3 border border-[#333333] bg-black/85 backdrop-blur-md px-2.5 py-1 text-xs font-mono tracking-widest text-neutral-300 pointer-events-none z-20">
-              [ ${activeIdx + 1} / ${images.length} ]
-            </div>
-            ${renderHomeCarouselControls(images, activeIdx)}
-          ` : ''}
         </div>
 
         <!-- Curatorial Caption Block Beneath Image (Click links to Work Detail) -->
@@ -176,7 +163,19 @@ function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
           <div id="monolith-caption-box" class="cursor-pointer group/caption" data-work-id="${targetWorkId}">
             <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-1 flex items-center justify-between">
               <span>FEATURED EXHIBITION // ${exhibition.year || '2023'}</span>
-              <span class="text-xs text-neutral-400 font-mono">[ VIEW DETAILS → ]</span>
+              
+              ${hasMultipleImages ? `
+                <!-- Clean External Slider Controls for Multiple Photos -->
+                <div class="flex items-center gap-2 font-mono text-xs text-neutral-400">
+                  <button class="home-carousel-btn hover:text-white px-1 cursor-pointer" data-action="prev" aria-label="Previous">‹ PREV</button>
+                  <span class="text-neutral-600">/</span>
+                  <span class="text-white font-bold">${activeIdx + 1}/${images.length}</span>
+                  <span class="text-neutral-600">/</span>
+                  <button class="home-carousel-btn hover:text-white px-1 cursor-pointer" data-action="next" aria-label="Next">NEXT ›</button>
+                </div>
+              ` : `
+                <span class="text-xs text-neutral-400 font-mono">[ VIEW DETAILS → ]</span>
+              `}
             </div>
             <h1 class="text-2xl sm:text-3xl font-black font-brand uppercase tracking-tight text-white group-hover/caption:text-neutral-300 transition-colors leading-tight mb-1">
               ${exhibition.title}
@@ -205,35 +204,19 @@ function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
   // Desktop / Tablet View: Pure 16:9 Monolith
   return `
     <main class="w-full flex-1 flex flex-col justify-center items-center px-6 sm:px-10 lg:px-14 py-4 sm:py-6 lg:py-8 my-auto">
-      <!-- Strict 16:9 Floating Canvas with Height Adaptability (Click links to Detail) -->
+      <!-- Strict 16:9 Floating Canvas (100% Pure Clean: Absolutely Zero Badges, Buttons, or Overlays on Image) -->
       <div 
         class="w-full max-w-4xl xl:max-w-5xl aspect-[16/9] max-h-[50vh] border border-white/20 bg-black overflow-hidden relative shadow-[0_25px_60px_-15px_rgba(255,255,255,0.07)] group cursor-pointer transition-all duration-700 hover:border-white/50" 
         id="monolith-hero-box"
         data-work-id="${targetWorkId}"
       >
-        <!-- Color reveal on mouse hover: default monochrome filter, hover reveals full original color -->
+        <!-- Color reveal on mouse hover: default monochrome filter, hover reveals full authentic color -->
         <img 
           id="home-hero-img"
           src="${activeImage.url}" 
           alt="${activeImage.alt || exhibition.heroAlt}" 
-          class="w-full h-full object-cover object-center filter grayscale contrast-125 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700 ease-out group-hover:scale-[1.018]"
+          class="w-full h-full object-cover object-center filter grayscale contrast-125 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700 ease-out group-hover:scale-[1.015]"
         />
-
-        <!-- Top-Left Badge: Year Stamp -->
-        <div class="absolute top-4 left-4 border border-[#333333] bg-black/85 backdrop-blur-md px-3 py-1 text-xs font-mono tracking-widest text-neutral-300 pointer-events-none z-20">
-          ${exhibition.year || '2023'}
-        </div>
-
-        ${hasMultipleImages ? `
-          <!-- Top-Right Photo Index Indicator -->
-          <div class="absolute top-4 right-4 border border-[#333333] bg-black/85 backdrop-blur-md px-3 py-1 text-xs font-mono tracking-widest text-neutral-300 pointer-events-none z-20">
-            [ ${activeIdx + 1} / ${images.length} ]
-          </div>
-          ${renderHomeCarouselControls(images, activeIdx)}
-        ` : ''}
-
-        <!-- Subtle hover overlay -->
-        <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
       </div>
 
       <!-- Curatorial Caption Row Beneath Image (Click links to Detail) -->
@@ -244,9 +227,21 @@ function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
           class="min-w-0 flex-1 cursor-pointer group/caption" 
           data-work-id="${targetWorkId}"
         >
-          <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-2 flex items-center gap-3">
+          <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-2 flex items-center justify-between sm:justify-start sm:gap-4">
             <span>FEATURED EXHIBITION // ${exhibition.year || '2023'}</span>
-            <span class="text-xs text-neutral-500 opacity-0 group-hover/caption:opacity-100 transition-opacity font-mono">[ VIEW DETAILS → ]</span>
+
+            ${hasMultipleImages ? `
+              <!-- External Minimal Photo Navigation Controls -->
+              <div class="flex items-center gap-2 font-mono text-xs text-neutral-400 bg-neutral-900/80 px-2.5 py-0.5 border border-neutral-800">
+                <button class="home-carousel-btn hover:text-white transition-colors cursor-pointer px-1" data-action="prev" aria-label="Previous">‹ PREV</button>
+                <span class="text-neutral-600">/</span>
+                <span class="text-white font-bold tracking-wider">${activeIdx + 1} of ${images.length}</span>
+                <span class="text-neutral-600">/</span>
+                <button class="home-carousel-btn hover:text-white transition-colors cursor-pointer px-1" data-action="next" aria-label="Next">NEXT ›</button>
+              </div>
+            ` : `
+              <span class="text-xs text-neutral-500 opacity-0 group-hover/caption:opacity-100 transition-opacity font-mono">[ VIEW DETAILS → ]</span>
+            `}
           </div>
           <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black font-brand uppercase tracking-tighter text-white group-hover/caption:text-neutral-300 transition-colors leading-tight mb-2">
             ${exhibition.title}
@@ -272,43 +267,5 @@ function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
         </div>
       </div>
     </main>
-  `;
-}
-
-/**
- * Arrow controls & dash indicators for home hero carousel
- */
-function renderHomeCarouselControls(images, activeIdx) {
-  return `
-    <!-- Interactive Arrow Controls -->
-    <div class="absolute inset-y-0 inset-x-3 sm:inset-x-4 flex items-center justify-between pointer-events-none z-30">
-      <button 
-        class="home-carousel-btn pointer-events-auto w-9 h-11 sm:w-11 sm:h-13 flex items-center justify-center bg-black/85 hover:bg-white hover:text-black text-white border border-white/30 backdrop-blur transition-all duration-200 cursor-pointer text-2xl font-mono shadow-2xl select-none"
-        data-action="prev"
-        aria-label="Previous photo"
-      >
-        ‹
-      </button>
-      <button 
-        class="home-carousel-btn pointer-events-auto w-9 h-11 sm:w-11 sm:h-13 flex items-center justify-center bg-black/85 hover:bg-white hover:text-black text-white border border-white/30 backdrop-blur transition-all duration-200 cursor-pointer text-2xl font-mono shadow-2xl select-none"
-        data-action="next"
-        aria-label="Next photo"
-      >
-        ›
-      </button>
-    </div>
-
-    <!-- Bottom Dash Indicators (Clickable) -->
-    <div class="absolute bottom-3.5 sm:bottom-4 inset-x-0 flex justify-center items-center gap-2 z-30 pointer-events-none">
-      ${images.map((_, i) => `
-        <button 
-          class="home-dash-indicator pointer-events-auto p-1 cursor-pointer focus:outline-none"
-          data-slide-index="${i}"
-          aria-label="Jump to photo ${i + 1}"
-        >
-          <span class="block h-[3px] ${i === activeIdx ? 'w-6 bg-white shadow-glow' : 'w-2.5 bg-neutral-600 hover:bg-neutral-400'} transition-all duration-300 rounded-full"></span>
-        </button>
-      `).join('')}
-    </div>
   `;
 }
