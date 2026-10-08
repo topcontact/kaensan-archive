@@ -1,3 +1,5 @@
+import { CategoryInput } from '../components/CategoryInput.jsx';
+
 export default {
   name: 'work',
   title: 'Work (ผลงาน)',
@@ -38,17 +40,10 @@ export default {
     {
       name: 'category',
       title: 'Category (หมวดหมู่)',
+      description: 'เลือกจาก Dropdown หรือพิมพ์หมวดหมู่เองตามต้องการ',
       type: 'string',
-      options: {
-        list: [
-          { title: 'MICROSCOPY & SCULPTURE', value: 'MICROSCOPY & SCULPTURE' },
-          { title: 'ELECTRON MICROSCOPY', value: 'ELECTRON MICROSCOPY' },
-          { title: 'VIDEO & FILM', value: 'VIDEO & FILM' },
-          { title: 'MATERIAL SCULPTURE', value: 'MATERIAL SCULPTURE' },
-          { title: 'PRINT & SOUND', value: 'PRINT & SOUND' },
-          { title: 'PHOTOGRAPHY & FILM', value: 'PHOTOGRAPHY & FILM' },
-          { title: 'INSTALLATION', value: 'INSTALLATION' },
-        ],
+      components: {
+        input: CategoryInput,
       },
     },
     {
