@@ -29,3 +29,5 @@ pnpm-debug.log*
 pdf_exports/
 exports/
 scripts/
+.vercel
+.env*
