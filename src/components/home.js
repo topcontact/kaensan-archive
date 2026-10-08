@@ -10,14 +10,14 @@ import { renderFooter } from './footer.js';
  * - Clean Footer: BANGKOK, TH (left) | INSTAGRAM, EMAIL, © 2024 KAENSAN (right)
  */
 
-export function renderHomeScreenDesktop(homeSlideIndex = 0) {
+export function renderHomeScreenDesktop() {
   const exhibition = ARCHIVE_DATA.currentExhibition;
   return `
     <div class="min-h-screen w-full bg-black text-[#F0F0F0] selection:bg-white selection:text-black select-none flex flex-col justify-between overflow-x-hidden">
       ${renderInstitutionalNavbar(false)}
       
       <div class="flex-1 flex flex-col justify-between">
-        ${renderHeroMonolith(exhibition, false, homeSlideIndex)}
+        ${renderHeroMonolith(exhibition, false)}
       </div>
 
       ${renderFooter({ containerClass: 'w-full max-w-7xl mx-auto' })}
@@ -25,14 +25,14 @@ export function renderHomeScreenDesktop(homeSlideIndex = 0) {
   `;
 }
 
-export function renderHomeScreenMobile(homeSlideIndex = 0) {
+export function renderHomeScreenMobile() {
   const exhibition = ARCHIVE_DATA.currentExhibition;
   return `
     <div class="min-h-screen w-full bg-black text-[#F0F0F0] selection:bg-white selection:text-black select-none flex flex-col justify-between overflow-x-hidden">
       ${renderInstitutionalNavbar(true)}
       
       <div class="flex-1 flex flex-col justify-between">
-        ${renderHeroMonolith(exhibition, true, homeSlideIndex)}
+        ${renderHeroMonolith(exhibition, true)}
       </div>
 
       ${renderFooter()}
@@ -112,36 +112,20 @@ function renderInstitutionalNavbar(isMobile) {
 
 /**
  * Pure 16:9 Floating Monolith Hero Canvas & Curatorial Caption
- * Apple Typographic Hierarchy with direct link to Work Dossier & Color Hover
+ * Option B: Single Iconic Hero Key Visual (Zero Slideshow on Home Screen)
+ * Clicking the image or caption leads directly to the Work Dossier Detail Page
  */
-function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
+function renderHeroMonolith(exhibition, isMobile) {
   const targetWorkId = exhibition.id || 'heavy-metal-2023';
   const work = getWorkById(targetWorkId);
 
-  // Collect all available images for this exhibition work
-  let images = [];
-  if (work && Array.isArray(work.images) && work.images.length > 0) {
-    images = work.images;
-  } else {
-    if (exhibition.heroImage) {
-      images.push({ url: exhibition.heroImage, alt: exhibition.heroAlt || exhibition.title });
-    }
-    if (work && work.plate && work.plate !== exhibition.heroImage) {
-      images.push({ url: work.plate, alt: `${exhibition.title} — Archival Plate` });
-    }
-  }
-
-  if (images.length === 0) {
-    images = [{ url: exhibition.heroImage || '/assets/works/heavy_metal/heavy_metal_main.png', alt: exhibition.heroAlt || exhibition.title }];
-  }
-
-  const activeIdx = Math.max(0, Math.min(homeSlideIndex, images.length - 1));
-  const activeImage = images[activeIdx] || images[0];
-  const hasMultipleImages = images.length > 1;
+  // Single Iconic Hero Image
+  const heroUrl = exhibition.heroImage || (work && (work.image || work.plate)) || '/assets/works/heavy_metal/heavy_metal_main.png';
+  const heroAlt = exhibition.heroAlt || exhibition.title || 'Featured Work';
 
   if (isMobile) {
     return `
-      <!-- Mobile View: Pure Minimal Monolith (Zero Clutter on Canvas) -->
+      <!-- Mobile View: Pure Minimal Monolith (Zero Clutter, Single Hero Frame) -->
       <main class="w-full flex-1 flex flex-col justify-center items-center px-4 sm:px-6 py-5 sm:py-6 my-auto">
         <!-- Strict 16:9 Floating Art Canvas (Click goes to detail) -->
         <div 
@@ -152,8 +136,8 @@ function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
           <!-- Color reveal on touch/hover: Default grayscale, reveals full color on hover/touch -->
           <img 
             id="home-hero-img"
-            src="${activeImage.url}" 
-            alt="${activeImage.alt || exhibition.heroAlt}" 
+            src="${heroUrl}" 
+            alt="${heroAlt}" 
             class="w-full h-full object-cover object-center filter grayscale contrast-125 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700 ease-out group-hover:scale-[1.02]"
           />
         </div>
@@ -163,19 +147,7 @@ function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
           <div id="monolith-caption-box" class="cursor-pointer group/caption" data-work-id="${targetWorkId}">
             <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-1 flex items-center justify-between">
               <span>FEATURED EXHIBITION // ${exhibition.year || '2023'}</span>
-              
-              ${hasMultipleImages ? `
-                <!-- Clean External Slider Controls for Multiple Photos -->
-                <div class="flex items-center gap-2 font-mono text-xs text-neutral-400">
-                  <button class="home-carousel-btn hover:text-white px-1 cursor-pointer" data-action="prev" aria-label="Previous">‹ PREV</button>
-                  <span class="text-neutral-600">/</span>
-                  <span class="text-white font-bold">${activeIdx + 1}/${images.length}</span>
-                  <span class="text-neutral-600">/</span>
-                  <button class="home-carousel-btn hover:text-white px-1 cursor-pointer" data-action="next" aria-label="Next">NEXT ›</button>
-                </div>
-              ` : `
-                <span class="text-xs text-neutral-400 font-mono">[ VIEW DETAILS → ]</span>
-              `}
+              <span class="text-xs text-neutral-400 font-mono">[ VIEW DETAILS → ]</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black font-brand uppercase tracking-tight text-white group-hover/caption:text-neutral-300 transition-colors leading-tight mb-1">
               ${exhibition.title}
@@ -201,7 +173,7 @@ function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
     `;
   }
 
-  // Desktop / Tablet View: Pure 16:9 Monolith
+  // Desktop / Tablet View: Pure 16:9 Monolith (Single Iconic Frame)
   return `
     <main class="w-full flex-1 flex flex-col justify-center items-center px-6 sm:px-10 lg:px-14 py-4 sm:py-6 lg:py-8 my-auto">
       <!-- Strict 16:9 Floating Canvas (100% Pure Clean: Absolutely Zero Badges, Buttons, or Overlays on Image) -->
@@ -213,8 +185,8 @@ function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
         <!-- Color reveal on mouse hover: default monochrome filter, hover reveals full authentic color -->
         <img 
           id="home-hero-img"
-          src="${activeImage.url}" 
-          alt="${activeImage.alt || exhibition.heroAlt}" 
+          src="${heroUrl}" 
+          alt="${heroAlt}" 
           class="w-full h-full object-cover object-center filter grayscale contrast-125 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700 ease-out group-hover:scale-[1.015]"
         />
       </div>
@@ -229,19 +201,7 @@ function renderHeroMonolith(exhibition, isMobile, homeSlideIndex = 0) {
         >
           <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-2 flex items-center justify-between sm:justify-start sm:gap-4">
             <span>FEATURED EXHIBITION // ${exhibition.year || '2023'}</span>
-
-            ${hasMultipleImages ? `
-              <!-- External Minimal Photo Navigation Controls -->
-              <div class="flex items-center gap-2 font-mono text-xs text-neutral-400 bg-neutral-900/80 px-2.5 py-0.5 border border-neutral-800">
-                <button class="home-carousel-btn hover:text-white transition-colors cursor-pointer px-1" data-action="prev" aria-label="Previous">‹ PREV</button>
-                <span class="text-neutral-600">/</span>
-                <span class="text-white font-bold tracking-wider">${activeIdx + 1} of ${images.length}</span>
-                <span class="text-neutral-600">/</span>
-                <button class="home-carousel-btn hover:text-white transition-colors cursor-pointer px-1" data-action="next" aria-label="Next">NEXT ›</button>
-              </div>
-            ` : `
-              <span class="text-xs text-neutral-500 opacity-0 group-hover/caption:opacity-100 transition-opacity font-mono">[ VIEW DETAILS → ]</span>
-            `}
+            <span class="text-xs text-neutral-500 opacity-0 group-hover/caption:opacity-100 transition-opacity font-mono">[ VIEW DETAILS → ]</span>
           </div>
           <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black font-brand uppercase tracking-tighter text-white group-hover/caption:text-neutral-300 transition-colors leading-tight mb-2">
             ${exhibition.title}

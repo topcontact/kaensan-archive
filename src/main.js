@@ -90,7 +90,7 @@ function renderApp() {
   let htmlContent = '';
 
   if (state.activePage === 'home') {
-    htmlContent = isMobile ? renderHomeScreenMobile(state.homeSlideIndex) : renderHomeScreenDesktop(state.homeSlideIndex);
+    htmlContent = isMobile ? renderHomeScreenMobile() : renderHomeScreenDesktop();
   } else if (state.activePage === 'works') {
     htmlContent = renderWorksCatalogue(state.cardSlideIndices);
   } else if (state.activePage === 'about') {
@@ -102,7 +102,7 @@ function renderApp() {
       ? renderArchiveDetailMobile(state.selectedWorkId, state.dossierSlideIndex) 
       : renderArchiveDetailDesktop(state.selectedWorkId, state.dossierSlideIndex);
   } else {
-    htmlContent = renderHomeScreenDesktop(state.homeSlideIndex);
+    htmlContent = renderHomeScreenDesktop();
   }
 
   app.innerHTML = htmlContent;
@@ -121,101 +121,12 @@ function bindEvents() {
   ['monolith-hero-box', 'monolith-caption-box'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-      el.addEventListener('click', (e) => {
-        // Do not navigate if user clicked prev/next carousel controls or dash indicators
-        if (e.target.closest('.home-carousel-btn') || e.target.closest('.home-dash-indicator')) {
-          return;
-        }
-        if (isGlobalSwiping) return;
+      el.addEventListener('click', () => {
         const workId = el.getAttribute('data-work-id') || ARCHIVE_DATA.currentExhibition?.id || 'heavy-metal-2023';
         navigateTo('detail', { workId });
       });
     }
   });
-
-  // Home Screen: Multi-photo Carousel Controls (Prev/Next buttons)
-  const homeCarouselBtns = document.querySelectorAll('.home-carousel-btn');
-  homeCarouselBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      const action = btn.getAttribute('data-action');
-      const targetWorkId = ARCHIVE_DATA.currentExhibition?.id || 'heavy-metal-2023';
-      const work = getWorkById(targetWorkId);
-      let totalImages = (work && Array.isArray(work.images) && work.images.length > 0) ? work.images.length : 1;
-      if (work && work.plate && work.plate !== work.image && totalImages === 1) totalImages = 2;
-
-      if (action === 'prev') {
-        state.homeSlideIndex = (state.homeSlideIndex - 1 + totalImages) % totalImages;
-      } else {
-        state.homeSlideIndex = (state.homeSlideIndex + 1) % totalImages;
-      }
-      renderApp();
-    });
-  });
-
-  // Home Screen: Clickable Dash Indicators
-  const homeDashIndicators = document.querySelectorAll('.home-dash-indicator');
-  homeDashIndicators.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      const idx = parseInt(btn.getAttribute('data-slide-index'), 10);
-      if (!isNaN(idx)) {
-        state.homeSlideIndex = idx;
-        renderApp();
-      }
-    });
-  });
-
-  // Home Screen: Touch Swipe on Hero Canvas
-  const monolithBox = document.getElementById('monolith-hero-box');
-  if (monolithBox) {
-    let startX = 0;
-    let startY = 0;
-    let isMoving = false;
-
-    monolithBox.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        isMoving = false;
-      }
-    }, { passive: true });
-
-    monolithBox.addEventListener('touchmove', (e) => {
-      if (e.touches.length === 1) {
-        const deltaX = e.touches[0].clientX - startX;
-        const deltaY = e.touches[0].clientY - startY;
-        if (Math.abs(deltaX) > 15 && Math.abs(deltaX) > Math.abs(deltaY)) {
-          isMoving = true;
-          isGlobalSwiping = true;
-        }
-      }
-    }, { passive: true });
-
-    monolithBox.addEventListener('touchend', (e) => {
-      if (isMoving) {
-        const endX = e.changedTouches[0].clientX;
-        const deltaX = endX - startX;
-        const targetWorkId = ARCHIVE_DATA.currentExhibition?.id || 'heavy-metal-2023';
-        const work = getWorkById(targetWorkId);
-        let totalImages = (work && Array.isArray(work.images) && work.images.length > 0) ? work.images.length : 1;
-        if (work && work.plate && work.plate !== work.image && totalImages === 1) totalImages = 2;
-
-        if (totalImages > 1) {
-          if (deltaX < -40) {
-            state.homeSlideIndex = (state.homeSlideIndex + 1) % totalImages;
-            renderApp();
-          } else if (deltaX > 40) {
-            state.homeSlideIndex = (state.homeSlideIndex - 1 + totalImages) % totalImages;
-            renderApp();
-          }
-        }
-        setTimeout(() => { isGlobalSwiping = false; }, 100);
-      }
-    }, { passive: true });
-  }
 
   // CTA Explore Archive Buttons -> Works Catalog
   ['cta-explore-archive', 'cta-explore-archive-mobile', 'mobile-cta-explore'].forEach(id => {
@@ -959,22 +870,6 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     const container = document.getElementById('modal-container');
     if (container) container.innerHTML = '';
-  }
-  if (state.activePage === 'home') {
-    const targetWorkId = ARCHIVE_DATA.currentExhibition?.id || 'heavy-metal-2023';
-    const work = getWorkById(targetWorkId);
-    let totalImages = (work && Array.isArray(work.images) && work.images.length > 0) ? work.images.length : 1;
-    if (work && work.plate && work.plate !== work.image && totalImages === 1) totalImages = 2;
-
-    if (totalImages > 1) {
-      if (e.key === 'ArrowLeft') {
-        state.homeSlideIndex = (state.homeSlideIndex - 1 + totalImages) % totalImages;
-        renderApp();
-      } else if (e.key === 'ArrowRight') {
-        state.homeSlideIndex = (state.homeSlideIndex + 1) % totalImages;
-        renderApp();
-      }
-    }
   }
 });
 
