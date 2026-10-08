@@ -41,16 +41,58 @@ function transformSanityWork(doc) {
   const workId = doc.slug?.current || doc.slug || doc._id;
   const localMatch = RAW_ARCHIVE_DATA.works.find((w) => w.id === workId);
 
-  const coverUrl = doc.coverImage?.asset ? urlFor(doc.coverImage).url() : (localMatch ? localMatch.image : '');
-  const plateUrl = doc.plateImage?.asset ? urlFor(doc.plateImage).url() : (localMatch ? localMatch.plate : coverUrl);
+  // 1. Main Hero Gallery Images (รูปหลักของผลงาน)
+  let mainList = [];
+  if (Array.isArray(doc.mainImages) && doc.mainImages.length > 0) {
+    mainList = doc.mainImages.map((img) => ({
+      url: img.asset ? urlFor(img).url() : (img.url || ''),
+      title: img.title || img.caption || '',
+      alt: img.alt || doc.title || '',
+      isMainHero: Boolean(img.isMainHero),
+    })).filter(img => img.url);
+  }
 
-  const gallery = (Array.isArray(doc.galleryImages) && doc.galleryImages.length > 0)
-    ? doc.galleryImages.map((img) => ({
+  // Fallback to legacy gallery / cover image if mainImages is not yet populated
+  if (mainList.length === 0) {
+    if (Array.isArray(doc.galleryImages) && doc.galleryImages.length > 0) {
+      mainList = doc.galleryImages.map((img) => ({
         url: img.asset ? urlFor(img).url() : (img.url || ''),
         title: img.title || '',
         alt: img.alt || doc.title || '',
-      }))
-    : (localMatch?.images || []);
+        isMainHero: false,
+      })).filter(img => img.url);
+    }
+  }
+
+  // Find designated Main Hero Image (รูป main หากงานนี้อยู่ในหน้าแรกของ web)
+  const designatedHero = mainList.find((img) => img.isMainHero);
+  const heroObj = designatedHero || mainList[0];
+
+  const coverUrl = heroObj?.url 
+    || (doc.coverImage?.asset ? urlFor(doc.coverImage).url() : '')
+    || (localMatch ? localMatch.image : '');
+
+  const plateUrl = doc.plateImage?.asset 
+    ? urlFor(doc.plateImage).url() 
+    : (localMatch ? localMatch.plate : coverUrl);
+
+  const imagesGallery = mainList.length > 0 
+    ? mainList 
+    : (localMatch?.images || (coverUrl ? [{ url: coverUrl, alt: doc.title || '' }] : []));
+
+  // 2. Process & Documentation Images (รูปรอง / รูปเบื้องหลังของงาน)
+  let docList = [];
+  if (Array.isArray(doc.documentationImages) && doc.documentationImages.length > 0) {
+    docList = doc.documentationImages.map((img) => ({
+      url: img.asset ? urlFor(img).url() : (img.url || ''),
+      title: img.title || '',
+      alt: img.alt || `${doc.title} Documentation`,
+    })).filter(img => img.url);
+  }
+
+  if (docList.length === 0) {
+    docList = imagesGallery;
+  }
 
   return {
     id: doc.slug?.current || doc._id,
@@ -68,8 +110,9 @@ function transformSanityWork(doc) {
     status: doc.status || 'ARCHIVED',
     image: coverUrl,
     plate: plateUrl,
-    images: gallery,
-    imageAlt: doc.coverImage?.alt || doc.title || 'Work documentation',
+    images: imagesGallery,
+    documentationImages: docList,
+    imageAlt: heroObj?.alt || doc.coverImage?.alt || doc.title || 'Work documentation',
     summary: doc.summary || '',
     statement: doc.statement || '',
   };
@@ -89,6 +132,8 @@ export async function fetchLiveArchiveData() {
       "works": *[_type == "work"] | order(order asc, year desc) {
         ...,
         "slug": slug.current,
+        mainImages[] { ..., asset-> },
+        documentationImages[] { ..., asset-> },
         coverImage { ..., asset-> },
         plateImage { ..., asset-> },
         galleryImages[] { ..., asset-> }
@@ -107,6 +152,7 @@ export async function fetchLiveArchiveData() {
           featuredWork-> {
             ...,
             "slug": slug.current,
+            mainImages[] { ..., asset-> },
             coverImage { ..., asset-> },
             plateImage { ..., asset-> }
           }

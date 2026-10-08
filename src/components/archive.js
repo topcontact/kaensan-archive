@@ -24,13 +24,15 @@ export function renderArchiveDetailDesktop(workId = 'heavy-metal-2023', slideInd
   const heroImageUrl = activeHeroObj ? (typeof activeHeroObj === 'string' ? activeHeroObj : activeHeroObj.url) : work.image;
   const heroImageAlt = activeHeroObj ? (activeHeroObj.alt || work.imageAlt) : (work.imageAlt || work.title);
 
-  // Process & Documentation Images
-  const processImages = hasMultipleImages 
-    ? work.images 
-    : [
-        { url: work.plate || work.image, alt: work.title },
-        { url: work.image, alt: work.title }
-      ];
+  // Process & Documentation Images (รูปรอง / ภาพเบื้องหลัง)
+  const processImages = (Array.isArray(work.documentationImages) && work.documentationImages.length > 0)
+    ? work.documentationImages
+    : (hasMultipleImages 
+        ? work.images 
+        : [
+            { url: work.plate || work.image, alt: work.title },
+            { url: work.image, alt: work.title }
+          ]);
 
   const mosaicSpans = [
     'md:col-span-7',
@@ -228,12 +230,15 @@ export function renderArchiveDetailMobile(workId = 'heavy-metal-2023', slideInde
   const heroImageUrl = activeHeroObj ? (typeof activeHeroObj === 'string' ? activeHeroObj : activeHeroObj.url) : work.image;
   const heroImageAlt = activeHeroObj ? (activeHeroObj.alt || work.imageAlt) : (work.imageAlt || work.title);
 
-  const processImages = hasMultipleImages 
-    ? work.images 
-    : [
-        { url: work.plate || work.image, alt: work.title },
-        { url: work.image, alt: work.title }
-      ];
+  // Process & Documentation Images (รูปรอง / ภาพเบื้องหลัง)
+  const processImages = (Array.isArray(work.documentationImages) && work.documentationImages.length > 0)
+    ? work.documentationImages
+    : (hasMultipleImages 
+        ? work.images 
+        : [
+            { url: work.plate || work.image, alt: work.title },
+            { url: work.image, alt: work.title }
+          ]);
 
   return `
     <div class="min-h-screen bg-black text-[#F0F0F0] select-none flex flex-col justify-between">
