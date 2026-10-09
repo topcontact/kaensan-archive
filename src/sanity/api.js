@@ -169,7 +169,16 @@ export async function fetchLiveArchiveData() {
       let currentExhibition = RAW_ARCHIVE_DATA.currentExhibition;
       if (result.settings?.currentExhibition) {
         const ce = result.settings.currentExhibition;
-        const fw = ce.featuredWork ? transformSanityWork(ce.featuredWork) : transformedWorks[0];
+        const validFeaturedWork = (ce.featuredWork && (ce.featuredWork._id || ce.featuredWork.title)) 
+          ? transformSanityWork(ce.featuredWork) 
+          : null;
+
+        // Fallback work: Priority to 'heavy-metal-2023' or first work in catalog
+        const defaultWork = transformedWorks.find(w => w.id === 'heavy-metal-2023' || w.id === 'work-heavy-metal-2023') 
+          || transformedWorks[0] 
+          || RAW_ARCHIVE_DATA.currentExhibition;
+
+        const fw = validFeaturedWork || defaultWork;
         
         // Custom hero image override if provided, else use the work's image
         const heroImg = ce.customHeroImage?.asset ? urlFor(ce.customHeroImage).url() : fw.image;
