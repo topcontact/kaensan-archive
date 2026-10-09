@@ -1,3 +1,7 @@
+/**
+ * Site Settings Schema for Kaensan Archive
+ * Global configurations, branding, and featured exhibition controls
+ */
 export default {
   name: 'siteSettings',
   title: 'Site & Template Settings (การตั้งค่าทั่วไป)',
@@ -17,13 +21,6 @@ export default {
       initialValue: 'KAENSAN — Architectural & Exhibition Archive',
     },
     {
-      name: 'exhibitionStatus',
-      title: 'Exhibition Status (สถานะ / ป้ายกำกับนิทรรศการหน้าแรก)',
-      description: 'ข้อความกำกับที่แสดงเหนือชื่อผลงานหน้าแรก เช่น RECENT EXHIBITION, CURRENT EXHIBITION, ON VIEW, FEATURED EXHIBITION (ค่าเริ่มต้น: RECENT EXHIBITION)',
-      type: 'string',
-      initialValue: 'RECENT EXHIBITION',
-    },
-    {
       name: 'currentExhibition',
       title: 'Current Featured Exhibition (หน้าแรก Home Screen)',
       type: 'object',
@@ -39,10 +36,18 @@ export default {
         {
           name: 'featuredWork',
           title: '📌 เลือกผลงานหลักที่จะแสดงที่หน้าแรก (Featured Artwork)',
-          description: '✨ เลือกลิสต์ผลงาน ระบบจะดึงชื่อ, ปี, สื่อ, รูปภาพ, สถานที่จัดแสดง (Venue), และภัณฑารักษ์มาแสดงผลอัตโนมัติทันที',
+          description: '✨ เลือกลิสต์ผลงาน ระบบจะดึงชื่อ, ปี, สื่อ, รูปภาพ และสถานที่จัดแสดง (Venue) มาแสดงผลอัตโนมัติทันที',
           type: 'reference',
           to: [{ type: 'work' }],
           weak: true,
+        },
+        {
+          name: 'exhibitionStatus',
+          title: 'Exhibition Status (สถานะ / ป้ายกำกับนิทรรศการ)',
+          description: '*แสดงบนชื่องาน (เช่น RECENT EXHIBITION, CURRENT EXHIBITION, ON VIEW — ค่าเริ่มต้น: RECENT EXHIBITION)',
+          type: 'string',
+          initialValue: 'RECENT EXHIBITION',
+          fieldset: 'overrides',
         },
         {
           name: 'customTitle',
@@ -54,14 +59,14 @@ export default {
         {
           name: 'customSubtitle',
           title: 'คำบรรยายสื่อ / Subtitle Override',
-          description: 'เว้นว่างไว้ = ดึงคำบรรยายเทคนิค/สื่อจากผลงานอัตโนมัติ',
+          description: '*แสดงล่างชื่องาน (เว้นว่างไว้ = ดึงคำบรรยายเทคนิค/สื่อจากผลงานอัตโนมัติ)',
           type: 'string',
           fieldset: 'overrides',
         },
         {
-          name: 'exhibitionStatus',
-          title: 'Exhibition Status (สถานะ / ป้ายกำกับนิทรรศการ)',
-          description: 'ข้อความกำกับที่แสดงเหนือชื่อผลงาน เช่น RECENT EXHIBITION, CURRENT EXHIBITION, ON VIEW, FEATURED EXHIBITION (เว้นว่างไว้ = ใช้ค่าจาก Site Settings หรือ RECENT EXHIBITION)',
+          name: 'customVenue',
+          title: 'สถานที่จัดแสดง (Venue Override)',
+          description: '*แสดงล่าง คำบรรยายสื่อ (เว้นว่างไว้ = ดึงสถานที่จากผลงานที่เลือกอัตโนมัติ)',
           type: 'string',
           fieldset: 'overrides',
         },
@@ -71,42 +76,6 @@ export default {
           description: 'เว้นว่างไว้ = ใช้รูปภาพหลัก (Cover Image) ของผลงานที่เลือกอัตโนมัติ',
           type: 'image',
           options: { hotspot: true },
-          fieldset: 'overrides',
-        },
-        {
-          name: 'customVenue',
-          title: 'สถานที่จัดแสดง (Venue Override)',
-          description: 'เว้นว่างไว้ = ดึงสถานที่จากผลงานที่เลือกอัตโนมัติ',
-          type: 'string',
-          fieldset: 'overrides',
-        },
-        {
-          name: 'customCurator',
-          title: 'ภัณฑารักษ์ / Curator Override',
-          description: 'เว้นว่างไว้ = ดึงภัณฑารักษ์จากผลงานที่เลือกอัตโนมัติ',
-          type: 'string',
-          fieldset: 'overrides',
-        },
-        {
-          name: 'customStatus',
-          title: 'Archival Status Stamp',
-          description: 'เว้นว่างไว้ = ดึงสถานะจากผลงาน (เช่น PERMANENT ARCHIVE หรือ ARCHIVED)',
-          type: 'string',
-          fieldset: 'overrides',
-        },
-        {
-          name: 'customDates',
-          title: 'Dates / Tour Information',
-          description: 'ช่วงเวลาจัดแสดง เช่น MUSEUM OF SOMETHING // RIVER CITY BANGKOK',
-          type: 'string',
-          fieldset: 'overrides',
-        },
-        {
-          name: 'customCity',
-          title: 'City Stamp',
-          description: 'เช่น BANGKOK, TH',
-          type: 'string',
-          initialValue: 'BANGKOK, TH',
           fieldset: 'overrides',
         },
       ],
