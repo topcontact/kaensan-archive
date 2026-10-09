@@ -104,45 +104,39 @@ export default {
       },
       validation: (Rule) => Rule.required(),
     },
-    {
-      name: 'number',
-      title: '8. Work Index / Number (เช่น 01, 02)',
-      type: 'string',
-    },
-
     // -------------------------------------------------------------
     // 3. SPECIFICATIONS & STATEMENT (รายละเอียดเทคนิค & คำแถลง)
     // -------------------------------------------------------------
     {
       name: 'medium',
-      title: '9. FORMAT / Medium / Technique (เทคนิค/สื่อที่ใช้)',
+      title: '8. FORMAT / Medium / Technique (เทคนิค/สื่อที่ใช้)',
       type: 'string',
     },
     {
       name: 'duration',
-      title: '10. DURATION (ความยาว/ระยะเวลา เช่น 13-minute Loop)',
+      title: '9. DURATION (ความยาว/ระยะเวลา เช่น 13-minute Loop)',
       type: 'string',
     },
     {
       name: 'dimensions',
-      title: '11. DIMENSIONS (ขนาดผลงาน เช่น 60 cm x 45 cm)',
+      title: '10. DIMENSIONS (ขนาดผลงาน เช่น 60 cm x 45 cm)',
       type: 'string',
     },
     {
       name: 'components',
-      title: '12. Components / Installation Elements (องค์ประกอบการติดตั้ง)',
+      title: '11. Components / Installation Elements (องค์ประกอบการติดตั้ง)',
       type: 'text',
       rows: 2,
     },
     {
       name: 'statement',
-      title: '13. CURATORIAL STATEMENT (บทความ/แถลงการณ์ภัณฑารักษ์)',
+      title: '12. CURATORIAL STATEMENT (บทความ/แถลงการณ์ภัณฑารักษ์)',
       type: 'text',
       rows: 8,
     },
     {
       name: 'exhibitions',
-      title: '14. Exhibition History / Venues (สถานที่และประวัติการจัดแสดง)',
+      title: '13. Exhibition History / Venues (สถานที่และประวัติการจัดแสดง)',
       description: 'สามารถเพิ่มการจัดแสดงได้มากกว่า 1 ที่ พร้อมระบุ ปี, ชื่องาน, สถานที่ และเมือง โดยข้อมูลนี้จะถูกนำไปเรียงตาม Timeline ในหน้า About ให้โดยอัตโนมัติ (Single Source of Truth)',
       type: 'array',
       of: [
@@ -209,7 +203,7 @@ export default {
     },
     {
       name: 'curator',
-      title: '15. Curator / Institution (ภัณฑารักษ์/สถาบัน)',
+      title: '14. Curator / Institution (ภัณฑารักษ์/สถาบัน)',
       type: 'string',
     },
 
@@ -218,7 +212,7 @@ export default {
     // -------------------------------------------------------------
     {
       name: 'documentationImages',
-      title: '16. Process & Documentation (รูปรอง / รูปเบื้องหลังของงาน)',
+      title: '15. Process & Documentation (รูปรอง / รูปเบื้องหลังของงาน)',
       description: 'รูปภาพเบื้องหลังการทำงาน การติดตั้ง หรือภาพมุมมองในพื้นที่จัดแสดง (แสดงที่ส่วนล่างสุดของหน้าผลงาน)',
       type: 'array',
       of: [
@@ -241,17 +235,19 @@ export default {
       ],
     },
 
-    // -------------------------------------------------------------
-    // 5. ADMINISTRATIVE & SORTING
-    // -------------------------------------------------------------
+    // Backward-compatibility hidden fields for legacy records
+    {
+      name: 'number',
+      title: 'Legacy Work Index',
+      type: 'string',
+      hidden: true,
+    },
     {
       name: 'order',
-      title: '17. Sort Order (ลำดับการแสดงผล, 1 = แสดงแรกสุด)',
+      title: 'Legacy Sort Order',
       type: 'number',
-      initialValue: 1,
+      hidden: true,
     },
-
-    // Backward-compatibility hidden fields for legacy records
     {
       name: 'coverImage',
       title: 'Legacy Cover Image',
@@ -280,14 +276,14 @@ export default {
   ],
   orderings: [
     {
-      title: 'Custom Order',
-      name: 'orderAsc',
-      by: [{ field: 'order', direction: 'asc' }],
-    },
-    {
-      title: 'Year Descending',
+      title: 'Year Descending (เรียงตามปี ใหม่ล่าสุด → อดีต)',
       name: 'yearDesc',
       by: [{ field: 'year', direction: 'desc' }],
+    },
+    {
+      title: 'Title (A → Z)',
+      name: 'titleAsc',
+      by: [{ field: 'title', direction: 'asc' }],
     },
   ],
   preview: {

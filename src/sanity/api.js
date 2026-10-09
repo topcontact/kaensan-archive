@@ -136,7 +136,7 @@ export async function fetchLiveArchiveData() {
 
   try {
     const query = `{
-      "works": *[_type == "work"] | order(order asc, year desc) {
+      "works": *[_type == "work"] | order(year desc, _createdAt desc) {
         ...,
         "slug": slug.current,
         mainImages[] { ..., asset-> },
