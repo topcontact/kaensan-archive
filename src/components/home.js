@@ -146,7 +146,7 @@ function renderHeroMonolith(exhibition, isMobile) {
         <div class="w-full mt-5 flex flex-col gap-3">
           <div id="monolith-caption-box" class="cursor-pointer group/caption" data-work-id="${targetWorkId}">
             <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-1 flex items-center justify-between">
-              <span>FEATURED EXHIBITION // ${exhibition.year || '2023'}</span>
+              <span>${(exhibition.exhibitionStatus || 'RECENT EXHIBITION').trim()}${exhibition.year ? ` // ${exhibition.year}` : ''}</span>
               <span class="text-xs text-neutral-400 font-mono">[ VIEW DETAILS → ]</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-black font-brand uppercase tracking-tight text-white group-hover/caption:text-neutral-300 transition-colors leading-tight mb-1">
@@ -200,7 +200,7 @@ function renderHeroMonolith(exhibition, isMobile) {
           data-work-id="${targetWorkId}"
         >
           <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-2 flex items-center justify-between sm:justify-start sm:gap-4">
-            <span>FEATURED EXHIBITION // ${exhibition.year || '2023'}</span>
+            <span>${(exhibition.exhibitionStatus || 'RECENT EXHIBITION').trim()}${exhibition.year ? ` // ${exhibition.year}` : ''}</span>
             <span class="text-xs text-neutral-500 opacity-0 group-hover/caption:opacity-100 transition-opacity font-mono">[ VIEW DETAILS → ]</span>
           </div>
           <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black font-brand uppercase tracking-tighter text-white group-hover/caption:text-neutral-300 transition-colors leading-tight mb-2">

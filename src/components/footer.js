@@ -11,9 +11,7 @@ export function renderFooter({ containerClass = 'max-w-5xl xl:max-w-6xl mx-auto'
         
         <!-- Desktop Layout (sm:flex): Single horizontal bar -->
         <div class="hidden sm:flex justify-between items-center text-sm">
-          <div class="flex items-center gap-3">
-            <span class="text-neutral-500 uppercase tracking-wider text-sm">BANGKOK, TH</span>
-            <span class="text-neutral-700 mx-2">/</span>
+          <div>
             <span class="text-neutral-400 text-sm">© 2014—2024 KAENSAN RATTANASOMRERK</span>
           </div>
           <div class="flex items-center gap-8 text-neutral-400 text-sm">
@@ -22,19 +20,14 @@ export function renderFooter({ containerClass = 'max-w-5xl xl:max-w-6xl mx-auto'
           </div>
         </div>
 
-        <!-- Mobile Layout (sm:hidden): Architectural 2-row grid -->
-        <div class="flex flex-col gap-3.5 sm:hidden">
-          <!-- Row 1: Location on Left, Social Links on Right -->
+        <!-- Mobile Layout (sm:hidden): Architectural clean bar -->
+        <div class="flex flex-col gap-3 sm:hidden">
           <div class="flex justify-between items-center text-sm">
-            <span class="text-neutral-500 uppercase tracking-widest text-xs font-semibold">BANGKOK, TH</span>
+            <span class="text-neutral-400 text-xs">© 2014—2024 KAENSAN RATTANASOMRERK</span>
             <div class="flex items-center gap-5 text-sm text-neutral-300">
               <a href="https://instagram.com" target="_blank" rel="noreferrer" class="hover:text-white transition-colors">INSTAGRAM</a>
               <a href="mailto:kaensan@gmail.com" class="hover:text-white transition-colors">EMAIL</a>
             </div>
-          </div>
-          <!-- Row 2: Clean full-width Copyright (guaranteed no word wrapping glitches) -->
-          <div class="text-neutral-500 text-xs tracking-wider pt-2.5 border-t border-[#161616]">
-            © 2014—2024 KAENSAN RATTANASOMRERK
           </div>
         </div>
 

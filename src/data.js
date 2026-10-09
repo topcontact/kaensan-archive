@@ -7,6 +7,7 @@
 export const RAW_ARCHIVE_DATA = {
   currentExhibition: {
     id: 'heavy-metal-2023',
+    exhibitionStatus: 'RECENT EXHIBITION',
     title: 'HEAVY METAL — 2023',
     subtitle: '5µm SCANNING ELECTRON MICROSCOPE PHOTOGRAPHY & MULTIMODAL INSTALLATION',
     heroImage: '/assets/works/heavy_metal/heavy_metal_main.png',

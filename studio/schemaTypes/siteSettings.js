@@ -17,6 +17,13 @@ export default {
       initialValue: 'KAENSAN — Architectural & Exhibition Archive',
     },
     {
+      name: 'exhibitionStatus',
+      title: 'Exhibition Status (สถานะ / ป้ายกำกับนิทรรศการหน้าแรก)',
+      description: 'ข้อความกำกับที่แสดงเหนือชื่อผลงานหน้าแรก เช่น RECENT EXHIBITION, CURRENT EXHIBITION, ON VIEW, FEATURED EXHIBITION (ค่าเริ่มต้น: RECENT EXHIBITION)',
+      type: 'string',
+      initialValue: 'RECENT EXHIBITION',
+    },
+    {
       name: 'currentExhibition',
       title: 'Current Featured Exhibition (หน้าแรก Home Screen)',
       type: 'object',
@@ -48,6 +55,13 @@ export default {
           name: 'customSubtitle',
           title: 'คำบรรยายสื่อ / Subtitle Override',
           description: 'เว้นว่างไว้ = ดึงคำบรรยายเทคนิค/สื่อจากผลงานอัตโนมัติ',
+          type: 'string',
+          fieldset: 'overrides',
+        },
+        {
+          name: 'exhibitionStatus',
+          title: 'Exhibition Status (สถานะ / ป้ายกำกับนิทรรศการ)',
+          description: 'ข้อความกำกับที่แสดงเหนือชื่อผลงาน เช่น RECENT EXHIBITION, CURRENT EXHIBITION, ON VIEW, FEATURED EXHIBITION (เว้นว่างไว้ = ใช้ค่าจาก Site Settings หรือ RECENT EXHIBITION)',
           type: 'string',
           fieldset: 'overrides',
         },

@@ -195,6 +195,7 @@ export async function fetchLiveArchiveData() {
 
         currentExhibition = {
           id: fw.id,
+          exhibitionStatus: ce.exhibitionStatus?.trim() || result.settings?.exhibitionStatus?.trim() || 'RECENT EXHIBITION',
           title: ce.customTitle?.trim() ? ce.customTitle : defaultTitle,
           subtitle: ce.customSubtitle?.trim() ? ce.customSubtitle : (fw.subtitle || fw.medium || ''),
           heroImage: heroImg,
