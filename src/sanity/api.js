@@ -108,6 +108,13 @@ function transformSanityWork(doc) {
     venue: doc.venue || '',
     curator: doc.curator || '',
     status: doc.status || 'ARCHIVED',
+    exhibitions: Array.isArray(doc.exhibitions) ? doc.exhibitions.map((ex) => ({
+      year: String(ex.year || '').trim(),
+      exhibitionName: ex.exhibitionName || '',
+      venue: ex.venue || '',
+      location: ex.location || '',
+      note: ex.note || '',
+    })) : (localMatch?.exhibitions || []),
     image: coverUrl,
     plate: plateUrl,
     images: imagesGallery,
@@ -220,7 +227,72 @@ export async function fetchLiveArchiveData() {
       archiveStore.data = updatedData;
       setArchiveData(updatedData);
 
-      archiveStore.timeline = result.exhibitions || [];
+      // Single Source of Truth: Aggregate timeline dynamically from all works' exhibitions
+      const aggregatedTimeline = [];
+
+      transformedWorks.forEach((work) => {
+        if (Array.isArray(work.exhibitions) && work.exhibitions.length > 0) {
+          work.exhibitions.forEach((ex) => {
+            aggregatedTimeline.push({
+              year: String(ex.year || work.year || '').trim(),
+              title: work.title,
+              workId: work.id,
+              exhibitionName: ex.exhibitionName || 'Exhibition',
+              venue: ex.venue || '',
+              location: ex.location || '',
+              note: ex.note || '',
+              workNumber: work.number || '',
+              workSubtitle: work.subtitle || work.medium || '',
+              workMedium: work.medium || '',
+              workDimensions: work.dimensions || '',
+              workImage: work.image || '',
+              workImageAlt: work.imageAlt || work.title || '',
+              workSummary: work.summary || (work.statement ? work.statement.slice(0, 160) + '...' : ''),
+            });
+          });
+        }
+      });
+
+      // Also merge standalone exhibition documents if any exist and are not already in aggregated timeline
+      if (Array.isArray(result.exhibitions) && result.exhibitions.length > 0) {
+        result.exhibitions.forEach((ex) => {
+          const alreadyExists = aggregatedTimeline.some(
+            (item) => item.year === String(ex.year || '').trim() &&
+                      item.title?.toLowerCase() === (ex.title || '').toLowerCase() &&
+                      item.venue?.toLowerCase() === (ex.venue || '').toLowerCase()
+          );
+          if (!alreadyExists) {
+            const matchingWork = transformedWorks.find(
+              (w) => w.title.toLowerCase() === (ex.title || '').toLowerCase()
+            );
+            aggregatedTimeline.push({
+              year: String(ex.year || '').trim(),
+              title: ex.title,
+              workId: matchingWork?.id || null,
+              exhibitionName: ex.exhibitionName || 'Exhibition',
+              venue: ex.venue || '',
+              location: ex.location || '',
+              workNumber: matchingWork?.number || '',
+              workSubtitle: matchingWork?.subtitle || matchingWork?.medium || '',
+              workMedium: matchingWork?.medium || '',
+              workDimensions: matchingWork?.dimensions || '',
+              workImage: matchingWork?.image || '',
+              workImageAlt: matchingWork?.imageAlt || ex.title,
+              workSummary: matchingWork?.summary || '',
+            });
+          }
+        });
+      }
+
+      // Chronological descending sort (2024, 2023, 2021...)
+      aggregatedTimeline.sort((a, b) => {
+        const yA = parseInt(a.year, 10) || 0;
+        const yB = parseInt(b.year, 10) || 0;
+        if (yB !== yA) return yB - yA;
+        return (a.title || '').localeCompare(b.title || '');
+      });
+
+      archiveStore.timeline = aggregatedTimeline;
       archiveStore.contact = result.contact || null;
       archiveStore.siteSettings = result.settings || null;
       archiveStore.isLive = true;

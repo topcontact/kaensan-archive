@@ -141,9 +141,71 @@ export default {
       rows: 8,
     },
     {
+      name: 'exhibitions',
+      title: '14. Exhibition History / Venues (สถานที่และประวัติการจัดแสดง)',
+      description: 'สามารถเพิ่มการจัดแสดงได้มากกว่า 1 ที่ พร้อมระบุ ปี, ชื่องาน, สถานที่ และเมือง โดยข้อมูลนี้จะถูกนำไปเรียงตาม Timeline ในหน้า About ให้โดยอัตโนมัติ (Single Source of Truth)',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          name: 'exhibitionRecord',
+          title: 'Exhibition Record (รายการจัดแสดง)',
+          fields: [
+            {
+              name: 'year',
+              title: 'Year (ปี ค.ศ.)',
+              type: 'string',
+              placeholder: '2024',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'exhibitionName',
+              title: 'Exhibition / Project Name (ชื่องานนิทรรศการ / โครงการ)',
+              type: 'string',
+              placeholder: 'e.g. Solo Exhibition, Duo Exhibition, Biennale',
+            },
+            {
+              name: 'venue',
+              title: 'Venue / Gallery (สถานที่จัดแสดง / แกลเลอรี)',
+              type: 'string',
+              placeholder: 'e.g. Edith Russ Haus, SAC Gallery',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'location',
+              title: 'City / Country (เมือง, ประเทศ)',
+              type: 'string',
+              placeholder: 'e.g. Oldenburg, Germany or Bangkok, Thailand',
+            },
+            {
+              name: 'note',
+              title: 'Note / Details (รายละเอียดเพิ่มเติมย่อ)',
+              type: 'string',
+            },
+          ],
+          preview: {
+            select: {
+              year: 'year',
+              exhibitionName: 'exhibitionName',
+              venue: 'venue',
+              location: 'location',
+            },
+            prepare({ year, exhibitionName, venue, location }) {
+              const place = [venue, location].filter(Boolean).join(', ');
+              return {
+                title: `${year ? `[${year}] ` : ''}${exhibitionName || venue || 'Exhibition'}`,
+                subtitle: place || '',
+              };
+            },
+          },
+        },
+      ],
+    },
+    {
       name: 'venue',
-      title: '14. Exhibition Venue (สถานที่จัดแสดง)',
+      title: 'Legacy Venue (สถานที่จัดแสดงเดิม)',
       type: 'string',
+      hidden: true,
     },
     {
       name: 'curator',

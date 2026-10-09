@@ -226,6 +226,58 @@ function bindEvents() {
     aboutNavHome.addEventListener('click', () => handleGoBack('home'));
   }
 
+  // About Page Timeline: Interactive Work Preview Accordion & Direct Dossier Links
+  const timelineTriggers = document.querySelectorAll('.timeline-accordion-trigger');
+  timelineTriggers.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const targetId = btn.getAttribute('data-target-drawer');
+      const drawer = document.getElementById(targetId);
+      const icon = btn.querySelector('.timeline-chevron');
+      if (drawer) {
+        const isHidden = drawer.classList.contains('hidden');
+        if (isHidden) {
+          drawer.classList.remove('hidden');
+          btn.setAttribute('aria-expanded', 'true');
+          if (icon) icon.textContent = '−';
+        } else {
+          drawer.classList.add('hidden');
+          btn.setAttribute('aria-expanded', 'false');
+          if (icon) icon.textContent = '+';
+        }
+      }
+    });
+  });
+
+  const timelineDirectLinks = document.querySelectorAll('.timeline-direct-link, .timeline-goto-work');
+  timelineDirectLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const workId = link.getAttribute('data-work-id');
+      if (workId) {
+        navigateTo('detail', { workId });
+      }
+    });
+  });
+
+  const timelineCloseDrawers = document.querySelectorAll('.timeline-drawer-close');
+  timelineCloseDrawers.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const targetId = btn.getAttribute('data-target-drawer');
+      const drawer = document.getElementById(targetId);
+      if (drawer) {
+        drawer.classList.add('hidden');
+        const trigger = document.querySelector(`[data-target-drawer="${targetId}"]`);
+        if (trigger) {
+          trigger.setAttribute('aria-expanded', 'false');
+          const icon = trigger.querySelector('.timeline-chevron');
+          if (icon) icon.textContent = '+';
+        }
+      }
+    });
+  });
+
   // Contact Page In-App Back Button
   const contactNavHome = document.getElementById('contact-nav-home');
   if (contactNavHome) {

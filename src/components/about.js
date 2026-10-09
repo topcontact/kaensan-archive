@@ -231,18 +231,45 @@ const defaultTimelineData = [
  */
 export function renderAboutPage() {
   const artist = ARCHIVE_DATA.artist || {};
+  const allWorks = (archiveStore.data?.works && archiveStore.data.works.length > 0)
+    ? archiveStore.data.works
+    : (ARCHIVE_DATA.works || []);
+
+  const norm = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  const findMatchingWork = (title, workId) => {
+    if (workId) {
+      const match = allWorks.find((w) => w.id === workId);
+      if (match) return match;
+    }
+    const titleNorm = norm(title);
+    return allWorks.find((w) => {
+      const wNorm = norm(w.title);
+      return wNorm === titleNorm || wNorm.includes(titleNorm) || titleNorm.includes(wNorm);
+    });
+  };
+
   let timelineData = defaultTimelineData;
 
   if (archiveStore.timeline && archiveStore.timeline.length > 0) {
     const grouped = {};
     archiveStore.timeline.forEach((item) => {
-      const y = item.year || '2024';
+      const y = String(item.year || '2024').trim();
       if (!grouped[y]) grouped[y] = [];
       grouped[y].push({
         title: item.title,
+        workId: item.workId,
         exhibition: item.exhibitionName || 'Exhibition',
         venue: item.venue || '',
         location: item.location || '',
+        note: item.note || '',
+        workNumber: item.workNumber,
+        workSubtitle: item.workSubtitle,
+        workMedium: item.workMedium,
+        workDimensions: item.workDimensions,
+        workImage: item.workImage,
+        workImageAlt: item.workImageAlt,
+        workSummary: item.workSummary,
       });
     });
     timelineData = Object.keys(grouped)
@@ -377,17 +404,23 @@ export function renderAboutPage() {
         <!-- Middle Section: Exhibition Timeline (2012 — 2024) -->
         <section class="pt-10 sm:pt-16">
           <div class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-[#222222] gap-2">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-black font-brand uppercase tracking-tight text-white">
-              EXHIBITIONS & WORKS (2012 — 2024)
-            </h2>
-            <div class="text-sm font-mono text-neutral-400 uppercase tracking-widest">
-              OFFICIAL CV EXHIBITIONS
+            <div>
+              <h2 class="text-2xl sm:text-3xl md:text-4xl font-black font-brand uppercase tracking-tight text-white">
+                EXHIBITIONS & WORKS (2012 — 2024)
+              </h2>
+              <div class="text-xs sm:text-sm font-mono text-neutral-400 uppercase tracking-widest mt-1">
+                SINGLE SOURCE OF TRUTH — EXHIBITION HISTORY WITH DIRECT DOSSIER ACCESS
+              </div>
+            </div>
+            <div class="text-xs font-mono text-neutral-500 uppercase tracking-widest flex items-center gap-2">
+              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>CLICK WORK TO PREVIEW OR OPEN DOSSIER</span>
             </div>
           </div>
 
           <!-- Timeline Architectural Grid (Mobile & Desktop Responsive) -->
           <div class="border border-[#222222] divide-y divide-[#222222] bg-[#070707]">
-            ${timelineData.map(group => `
+            ${timelineData.map((group, groupIdx) => `
               <div class="p-5 sm:p-7 md:p-8 flex flex-col md:grid md:grid-cols-12 gap-4 sm:gap-6 hover:bg-[#0c0c0c] transition-colors">
                 
                 <!-- Year Column (Header on mobile, 2 cols on desktop) -->
@@ -395,32 +428,181 @@ export function renderAboutPage() {
                   <div class="text-2xl sm:text-3xl md:text-4xl font-black font-mono text-white tracking-tight">
                     ${group.year}
                   </div>
+                  <div class="text-xs font-mono text-neutral-500 hidden md:block mt-1">
+                    ${group.items.length} ${group.items.length === 1 ? 'ENTRY' : 'ENTRIES'}
+                  </div>
                 </div>
 
                 <!-- Events Column (10 cols) -->
                 <div class="md:col-span-10 divide-y divide-[#181818]">
-                  ${group.items.map((item, idx) => `
-                    <div class="${idx > 0 ? 'pt-4 mt-4' : ''} flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-2">
-                      <div>
-                        <span class="text-white font-bold font-brand uppercase tracking-tight text-base sm:text-lg md:text-xl">
-                          ${item.title}
-                        </span>
-                        <span class="text-neutral-500 text-sm font-mono mx-2">—</span>
-                        <span class="text-neutral-300 text-sm sm:text-base font-sans font-medium">
-                          ${item.exhibition}
-                        </span>
-                        <div class="text-sm font-mono text-neutral-400 mt-1.5">
-                          ${item.venue}
-                        </div>
-                      </div>
+                  ${group.items.map((item, itemIdx) => {
+                    const matchedWork = findMatchingWork(item.title, item.workId);
+                    const hasWork = Boolean(matchedWork);
+                    const itemKey = `${groupIdx}-${itemIdx}-${norm(item.title)}`;
+                    const previewImage = item.workImage || matchedWork?.image || matchedWork?.plate || '';
+                    const previewAlt = item.workImageAlt || matchedWork?.title || item.title;
+                    const workNumber = item.workNumber || matchedWork?.number || '01';
+                    const workCategory = matchedWork?.category || 'CONTEMPORARY ART';
+                    const workMedium = item.workMedium || matchedWork?.medium || item.workSubtitle || matchedWork?.subtitle || '';
+                    const workDimensions = item.workDimensions || matchedWork?.dimensions || '';
+                    const workSummary = item.workSummary || matchedWork?.summary || (matchedWork?.statement ? matchedWork.statement.slice(0, 180) + '...' : '');
 
-                      <div class="self-start sm:self-auto shrink-0 mt-1 sm:mt-0">
-                        <span class="text-sm font-mono text-neutral-300 border border-neutral-800 px-2.5 py-1 bg-neutral-950">
-                          ${item.location}
-                        </span>
+                    return `
+                      <div class="${itemIdx > 0 ? 'pt-5 mt-5' : ''} group/row">
+                        <!-- Header row -->
+                        <div class="flex flex-col md:flex-row md:items-baseline justify-between gap-3">
+                          
+                          <!-- Left: Clickable Work Title + Exhibition Meta -->
+                          <div class="flex-1 min-w-0">
+                            <div class="flex items-baseline flex-wrap gap-x-2 gap-y-1">
+                              ${hasWork ? `
+                                <button 
+                                  type="button"
+                                  class="timeline-accordion-trigger group/btn inline-flex items-center gap-2 text-left cursor-pointer focus:outline-none"
+                                  data-target-drawer="drawer-${itemKey}"
+                                  aria-expanded="false"
+                                  title="คลิกเพื่อเปิดกล่องดูรูปและรายละเอียดผลงาน"
+                                >
+                                  <span class="text-white font-bold font-brand uppercase tracking-tight text-base sm:text-lg md:text-xl group-hover/btn:text-neutral-300 underline decoration-neutral-700 underline-offset-4 group-hover/btn:decoration-white transition-all">
+                                    ${item.title}
+                                  </span>
+                                  <span class="timeline-chevron inline-flex items-center justify-center w-5 h-5 text-xs font-mono font-bold text-neutral-400 group-hover/btn:text-white border border-neutral-800 group-hover/btn:border-neutral-500 bg-neutral-950 transition-colors">
+                                    +
+                                  </span>
+                                </button>
+                              ` : `
+                                <span class="text-white font-bold font-brand uppercase tracking-tight text-base sm:text-lg md:text-xl">
+                                  ${item.title}
+                                </span>
+                              `}
+
+                              <span class="text-neutral-600 text-sm font-mono select-none">—</span>
+
+                              <span class="text-neutral-300 text-sm sm:text-base font-sans font-medium">
+                                ${item.exhibition}
+                              </span>
+                            </div>
+
+                            <div class="text-xs sm:text-sm font-mono text-neutral-400 mt-1.5 flex flex-wrap items-center gap-2">
+                              <span>${item.venue}</span>
+                              ${item.note ? `<span class="text-neutral-500 italic">(${item.note})</span>` : ''}
+                            </div>
+                          </div>
+
+                          <!-- Right: Location Badge + Direct Dossier Jump Link -->
+                          <div class="flex items-center gap-2 self-start md:self-auto shrink-0 mt-1 md:mt-0">
+                            ${item.location ? `
+                              <span class="text-xs sm:text-sm font-mono text-neutral-300 border border-neutral-800 px-2.5 py-1 bg-neutral-950">
+                                ${item.location}
+                              </span>
+                            ` : ''}
+
+                            ${hasWork ? `
+                              <button 
+                                type="button"
+                                class="timeline-direct-link text-xs font-mono uppercase tracking-widest text-neutral-400 hover:text-white border border-neutral-800 hover:border-white px-2.5 py-1 bg-neutral-950 hover:bg-neutral-900 transition-colors cursor-pointer flex items-center gap-1.5"
+                                data-work-id="${matchedWork.id}"
+                                title="เปิดหน้าผลงานเต็ม (Work Dossier)"
+                              >
+                                <span>DOSSIER</span>
+                                <span>↗</span>
+                              </button>
+                            ` : ''}
+                          </div>
+
+                        </div>
+
+                        <!-- Expandable Preview Drawer (Single Source of Truth) -->
+                        ${hasWork ? `
+                          <div 
+                            id="drawer-${itemKey}" 
+                            class="timeline-preview-drawer hidden mt-4 border border-neutral-800 bg-[#0a0a0a] overflow-hidden transition-all duration-300 shadow-2xl"
+                          >
+                            <div class="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6 items-center">
+                              
+                              <!-- Thumbnail Column (4 cols on desktop) -->
+                              <div class="md:col-span-4">
+                                <div class="relative aspect-video sm:aspect-[4/3] bg-black border border-neutral-800 overflow-hidden group/img cursor-pointer timeline-direct-link" data-work-id="${matchedWork.id}" title="คลิกเพื่อเปิดหน้าผลงานเต็ม">
+                                  ${previewImage ? `
+                                    <img 
+                                      src="${previewImage}" 
+                                      alt="${previewAlt}" 
+                                      class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500 ease-out"
+                                      loading="lazy"
+                                    />
+                                  ` : `
+                                    <div class="w-full h-full flex items-center justify-center text-neutral-600 font-mono text-xs">
+                                      NO PREVIEW IMAGE
+                                    </div>
+                                  `}
+                                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span class="text-xs font-mono tracking-widest text-white border border-white px-3 py-1 bg-black/80 backdrop-blur">
+                                      VIEW DOSSIER ↗
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <!-- Specs & Dossier Telemetry Column (8 cols on desktop) -->
+                              <div class="md:col-span-8 flex flex-col justify-between space-y-3">
+                                <div>
+                                  <!-- Micro Badges -->
+                                  <div class="flex flex-wrap items-center gap-2 text-xs font-mono tracking-widest text-neutral-500 uppercase mb-1">
+                                    <span>WORK NO. ${workNumber}</span>
+                                    <span>/</span>
+                                    <span class="text-neutral-400">${workCategory}</span>
+                                    <span>/</span>
+                                    <span class="text-neutral-300">${matchedWork.year || item.year}</span>
+                                  </div>
+
+                                  <!-- Work Title -->
+                                  <h4 class="text-lg sm:text-xl font-black font-brand uppercase text-white tracking-tight">
+                                    ${matchedWork.title}
+                                  </h4>
+
+                                  <!-- Medium / Dimensions -->
+                                  ${(workMedium || workDimensions) ? `
+                                    <div class="text-xs sm:text-sm font-mono text-neutral-400 mt-1">
+                                      ${[workMedium, workDimensions].filter(Boolean).join(' // ')}
+                                    </div>
+                                  ` : ''}
+
+                                  <!-- Short Curatorial Statement Excerpt -->
+                                  ${workSummary ? `
+                                    <p class="text-xs sm:text-sm text-neutral-300 font-sans leading-relaxed mt-2.5 line-clamp-3">
+                                      ${workSummary}
+                                    </p>
+                                  ` : ''}
+                                </div>
+
+                                <!-- Action CTAs -->
+                                <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-neutral-800/80">
+                                  <button 
+                                    type="button"
+                                    class="timeline-goto-work bg-white text-black hover:bg-neutral-200 px-4 py-2 text-xs font-mono font-bold uppercase tracking-widest flex items-center gap-2 cursor-pointer transition-colors"
+                                    data-work-id="${matchedWork.id}"
+                                  >
+                                    <span>OPEN WORK DOSSIER</span>
+                                    <span class="text-sm">→</span>
+                                  </button>
+
+                                  <button 
+                                    type="button"
+                                    class="timeline-drawer-close text-neutral-400 hover:text-white border border-neutral-800 hover:border-neutral-600 px-3 py-2 text-xs font-mono uppercase tracking-widest cursor-pointer transition-colors"
+                                    data-target-drawer="drawer-${itemKey}"
+                                  >
+                                    ✕ CLOSE
+                                  </button>
+                                </div>
+                              </div>
+
+                            </div>
+                          </div>
+                        ` : ''}
+
                       </div>
-                    </div>
-                  `).join('')}
+                    `;
+                  }).join('')}
                 </div>
 
               </div>

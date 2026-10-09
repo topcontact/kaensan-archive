@@ -172,13 +172,31 @@ export function renderArchiveDetailDesktop(workId = 'heavy-metal-2023', slideInd
                 ${paragraphs.map(p => `<p>${p}</p>`).join('')}
               </div>
 
-              <!-- VENUE moved directly under statement with thin divider -->
-              ${work.venue ? `
+              <!-- 14. EXHIBITION HISTORY & VENUES -->
+              ${(Array.isArray(work.exhibitions) && work.exhibitions.length > 0) ? `
+                <div class="mt-10 sm:mt-12 pt-8 sm:pt-10 border-t border-[#1a1a1a]">
+                  <div class="text-xs sm:text-sm font-mono uppercase tracking-widest text-neutral-500 font-bold mb-3">
+                    14. EXHIBITION HISTORY & VENUES (${work.exhibitions.length})
+                  </div>
+                  <div class="space-y-3 font-mono text-sm">
+                    ${work.exhibitions.map(ex => `
+                      <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 py-2 border-b border-[#141414]">
+                        <div>
+                          <span class="text-white font-bold mr-2">[${ex.year || ''}]</span>
+                          <span class="text-neutral-200 font-sans font-medium">${ex.exhibitionName || ''}</span>
+                          <span class="text-neutral-400 block sm:inline sm:ml-2">— ${ex.venue || ''}</span>
+                        </div>
+                        ${ex.location ? `<span class="text-neutral-400 text-xs px-2.5 py-0.5 border border-neutral-800 bg-neutral-950 shrink-0 self-start sm:self-auto">${ex.location}</span>` : ''}
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : (work.venue ? `
                 <div class="mt-10 sm:mt-12 pt-8 sm:pt-10 border-t border-[#1a1a1a]">
                   <div class="text-sm font-mono uppercase tracking-widest text-neutral-500 font-bold mb-2">VENUE</div>
                   <div class="text-base sm:text-lg text-neutral-200 font-sans leading-relaxed whitespace-pre-line">${work.venue}</div>
                 </div>
-              ` : ''}
+              ` : '')}
             </div>
           </div>
         </section>
@@ -337,13 +355,32 @@ export function renderArchiveDetailMobile(workId = 'heavy-metal-2023', slideInde
             ${paragraphs.map(p => `<p>${p}</p>`).join('')}
           </div>
 
-          <!-- VENUE under statement -->
-          ${work.venue ? `
+          <!-- 14. EXHIBITION HISTORY & VENUES (Mobile) -->
+          ${(Array.isArray(work.exhibitions) && work.exhibitions.length > 0) ? `
+            <div class="mt-6 pt-5 border-t border-[#1a1a1a]">
+              <div class="text-xs font-mono uppercase tracking-widest text-neutral-500 font-bold mb-2">
+                14. EXHIBITION HISTORY & VENUES (${work.exhibitions.length})
+              </div>
+              <div class="space-y-2.5 font-mono text-xs">
+                ${work.exhibitions.map(ex => `
+                  <div class="flex flex-col gap-1 py-1.5 border-b border-[#141414]">
+                    <div>
+                      <span class="text-white font-bold mr-1.5">[${ex.year || ''}]</span>
+                      <span class="text-neutral-200 font-sans font-medium">${ex.exhibitionName || ''}</span>
+                    </div>
+                    <div class="text-neutral-400">
+                      ${ex.venue || ''} ${ex.location ? `// ${ex.location}` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : (work.venue ? `
             <div class="mt-6 pt-5 border-t border-[#1a1a1a]">
               <div class="text-sm font-mono uppercase tracking-widest text-neutral-500 font-bold mb-1.5">VENUE</div>
               <div class="text-sm sm:text-base text-neutral-200 font-sans leading-relaxed whitespace-pre-line">${work.venue}</div>
             </div>
-          ` : ''}
+          ` : '')}
         </section>
 
         <!-- 4. Process & Documentation Image List -->
