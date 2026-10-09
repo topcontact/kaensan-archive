@@ -757,7 +757,7 @@ function openLightbox(item) {
 function openMobileDrawer() {
   const container = document.getElementById('modal-container');
   if (!container) return;
-  container.innerHTML = renderMobileNavDrawer();
+  container.innerHTML = renderMobileNavDrawer(state.activePage);
 
   const closeBtn = document.getElementById('drawer-close-btn');
   const close = () => { container.innerHTML = ''; };

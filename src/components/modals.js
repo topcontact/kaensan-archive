@@ -100,7 +100,15 @@ export function renderLightboxModal(item) {
 /**
  * Mobile Navigation Drawer
  */
-export function renderMobileNavDrawer() {
+export function renderMobileNavDrawer(activePage = 'home') {
+  const isHome = activePage === 'home';
+  const isWorks = activePage === 'works' || activePage === 'detail';
+  const isAbout = activePage === 'about';
+  const isContact = activePage === 'contact';
+
+  const activeClass = 'text-left text-white border-l-2 border-white pl-4 font-bold cursor-pointer';
+  const inactiveClass = 'text-left hover:text-white border-l-2 border-transparent hover:border-neutral-500 pl-4 hover:translate-x-2 transition-transform cursor-pointer';
+
   return `
     <div id="mobile-drawer-backdrop" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[140] flex flex-col justify-between p-6 animate-fade-in">
       <div class="flex justify-between items-center border-b border-[#222222] pb-4">
@@ -113,23 +121,22 @@ export function renderMobileNavDrawer() {
       </div>
 
       <nav class="my-auto flex flex-col gap-6 text-xl sm:text-2xl font-brand uppercase tracking-tight text-neutral-400">
-        <button id="drawer-nav-home" class="text-left text-white border-l-2 border-white pl-4 hover:translate-x-2 transition-transform cursor-pointer">
+        <button id="drawer-nav-home" class="${isHome ? activeClass : inactiveClass}">
           01 // HOME
         </button>
-        <button id="drawer-nav-archive" class="text-left hover:text-white border-l-2 border-transparent hover:border-neutral-500 pl-4 hover:translate-x-2 transition-transform cursor-pointer">
+        <button id="drawer-nav-archive" class="${isWorks ? activeClass : inactiveClass}">
           02 // WORK
         </button>
-        <button id="drawer-nav-about" class="text-left hover:text-white border-l-2 border-transparent hover:border-neutral-500 pl-4 hover:translate-x-2 transition-transform cursor-pointer">
+        <button id="drawer-nav-about" class="${isAbout ? activeClass : inactiveClass}">
           03 // ABOUT
         </button>
-        <button id="drawer-nav-contact" class="text-left hover:text-white border-l-2 border-transparent hover:border-neutral-500 pl-4 hover:translate-x-2 transition-transform cursor-pointer">
+        <button id="drawer-nav-contact" class="${isContact ? activeClass : inactiveClass}">
           04 // CONTACT
         </button>
       </nav>
 
-      <div class="border-t border-[#222222] pt-4 text-sm font-mono text-neutral-400 flex justify-between items-center">
-        <span>BANGKOK, TH</span>
-        <span class="text-neutral-300">© 2024 KAENSAN</span>
+      <div class="border-t border-[#222222] pt-4 text-xs font-mono text-neutral-400 flex justify-between items-center">
+        <span>© 2014—2024 KAENSAN RATTANASOMRERK</span>
       </div>
     </div>
   `;

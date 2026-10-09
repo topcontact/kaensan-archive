@@ -86,7 +86,7 @@ function renderInstitutionalNavbar(isMobile) {
 
       <!-- Right: Global Nav (WORK, ABOUT, CONTACT) -->
       <div class="hidden sm:flex items-center gap-8 lg:gap-10 text-sm font-mono tracking-widest uppercase text-neutral-400">
-        <button id="nav-btn-work" class="text-white hover:text-white transition-colors cursor-pointer border-b border-white pb-0.5 font-bold">
+        <button id="nav-btn-work" class="hover:text-white transition-colors cursor-pointer">
           WORK
         </button>
         <button id="nav-btn-about" class="hover:text-white transition-colors cursor-pointer">
