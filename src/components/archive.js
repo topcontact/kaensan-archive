@@ -97,19 +97,14 @@ export function renderArchiveDetailDesktop(workId = 'heavy-metal-2023', slideInd
               class="w-full h-full object-cover object-center transition-all duration-700 ease-out group-hover:scale-[1.015]"
             />
 
-            <!-- Top Left Minimal Year Badge -->
-            <div class="absolute top-3.5 left-3.5 sm:top-4 sm:left-4 border border-[#333333] bg-black/85 backdrop-blur-md px-2.5 py-1 sm:px-3 sm:py-1 text-sm font-mono tracking-widest text-neutral-200 pointer-events-none z-10">
-              ${work.year}
-            </div>
-
             ${hasMultipleImages ? renderStandardHeroControls(work, currentSlide) : ''}
           </div>
 
           <!-- Curatorial Title Bar Under Canvas (Apple Typographic Rhythm) -->
           <div class="mt-6 sm:mt-8 flex flex-col md:flex-row md:items-end justify-between gap-4 font-mono">
             <div class="min-w-0 flex-1">
-              <div class="font-mono text-xs uppercase tracking-widest text-neutral-400 font-semibold mb-2">
-                ARCHIVAL ENTRY // ${work.year}
+              <div class="font-mono text-sm uppercase tracking-widest text-white font-bold mb-2">
+                [ ${work.year} ]
               </div>
               <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black font-brand uppercase tracking-tighter text-white leading-tight mb-2">
                 ${work.title}
@@ -119,10 +114,8 @@ export function renderArchiveDetailDesktop(workId = 'heavy-metal-2023', slideInd
               </p>
             </div>
 
-            <div class="shrink-0 text-left md:text-right font-mono text-sm text-neutral-400 tracking-widest pt-2 md:pt-0 border-t md:border-t-0 border-[#1a1a1a]">
-              <span class="text-neutral-500">ARCHIVE REF</span>
-              <span class="text-neutral-700 mx-2">//</span>
-              <span class="text-white font-bold">[ ${work.year} ]</span>
+            <div class="shrink-0 text-left md:text-right font-mono text-sm tracking-widest pt-2 md:pt-0 border-t md:border-t-0 border-[#1a1a1a]">
+              <span class="text-white font-bold">[ ${work.status || 'ARCHIVED'} ]</span>
             </div>
           </div>
         </section>
@@ -295,25 +288,22 @@ export function renderArchiveDetailMobile(workId = 'heavy-metal-2023', slideInde
               class="w-full h-full object-cover object-center" 
             />
             
-            <!-- Top-Left Minimal Year Badge -->
-            <div class="absolute top-3 left-3 border border-[#333333] bg-black/85 backdrop-blur px-2.5 py-1 text-sm font-mono tracking-widest text-neutral-200 z-10">
-              ${work.year}
-            </div>
-
             ${hasMultipleImages ? renderMobileHeroControls(work, currentSlide) : ''}
           </div>
 
           <!-- Curatorial Caption Block Beneath Canvas -->
           <div class="mt-4 sm:mt-5 font-mono">
+            <div class="text-xs font-mono uppercase tracking-widest text-white font-bold mb-1.5">
+              [ ${work.year} ]
+            </div>
             <h1 class="text-2xl sm:text-3xl font-black font-brand uppercase tracking-tight text-white mb-1.5 leading-tight">
               ${work.title}
             </h1>
             <p class="text-sm font-mono text-neutral-400 uppercase tracking-wider mb-2 leading-relaxed">
               ${work.subtitle || work.medium}
             </p>
-            <div class="text-sm font-mono text-neutral-500 tracking-widest pt-2.5 border-t border-[#1a1a1a] flex justify-between items-center">
-              <span>ARCHIVE REF</span>
-              <span class="text-white font-bold">[ ${work.year} ]</span>
+            <div class="text-xs font-mono tracking-widest pt-2.5 border-t border-[#1a1a1a] flex justify-end items-center">
+              <span class="text-white font-bold">[ ${work.status || 'ARCHIVED'} ]</span>
             </div>
           </div>
         </section>
