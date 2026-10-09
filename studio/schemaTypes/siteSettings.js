@@ -35,6 +35,7 @@ export default {
           description: '✨ เลือกลิสต์ผลงาน ระบบจะดึงชื่อ, ปี, สื่อ, รูปภาพ, สถานที่จัดแสดง (Venue), และภัณฑารักษ์มาแสดงผลอัตโนมัติทันที',
           type: 'reference',
           to: [{ type: 'work' }],
+          weak: true,
         },
         {
           name: 'customTitle',
